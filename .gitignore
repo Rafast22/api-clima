@@ -1,2 +1,13 @@
 .venv
 .venv/*
+api/__pycache__
+api/__pycache__/*
+api/migrations/
+api/migrations/*
+api/__pycache__/
+api/__pycache__/*
+api/migrations/
+api/migrations/*
+api_clima/
+api_clima/*
+
