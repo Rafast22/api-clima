@@ -5,15 +5,19 @@ from ..Models.predict import Predict
 
 class PredictSerializer(serializers.Serializer):
     
-    date = serializers.CharField(max_length=11, allow_blank=False) #serializers.DateTimeField(auto_now_add=True)
-    PRECTOTCORR = serializers.CharField(max_digits=10, decimal_places=2, null=True)
+    date = serializers.DateTimeField(max_length=11, allow_blank=False) #serializers.DateTimeField(auto_now_add=True)
+    RH2M = serializers.DecimalField(max_digits=10, max_decimal_places=3, null=True)
+    PRECTOTCORR = serializers.DecimalField(max_digits=10, max_decimal_places=3, null=True)
+    QV2M = serializers.DecimalField(max_digits=10, max_decimal_places=3, null=True)
+    T2M = serializers.DecimalField(max_digits=10, max_decimal_places=3, null=True)
+    WS2M = serializers.DecimalField(max_digits=10, max_decimal_places=3, null=True)
   
     
     def create(self, validated_data):
         """
         Create and return a new `User` instance, given the validated data.
         """
-        return Predict.objects.create(**validated_data)
+        return Predict.objects.bulk_create(**validated_data)
 
     def update(self, instance, validated_data):
         """

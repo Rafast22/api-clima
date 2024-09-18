@@ -8,6 +8,6 @@ api/__pycache__/
 api/__pycache__/*
 api/migrations/
 api/migrations/*
-api_clima/
-api_clima/*
+api_clima/__pycache__/
+api_clima/__pycache__/
 

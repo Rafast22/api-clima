@@ -1,0 +1,57 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Makemigtarions",
+            "type": "shell",
+            "command": "source /home/rafa/Projects/Python/api-clima/api-clima/.venv/bin/activate; python /home/rafa/Projects/Python/api-clima/api-clima/manage.py makemigrations",
+            "problemMatcher": [],
+            "group": {
+                "kind": "build",
+                "isDefault": false
+            }
+        },
+        {
+            "label": "Migrate",
+            "type": "shell",
+            "command": "source /home/rafa/Projects/Python/api-clima/api-clima/.venv/bin/activate; python /home/rafa/Projects/Python/api-clima/api-clima/manage.py migrate",
+            "problemMatcher": [],
+            "group": {
+                "kind": "build",
+                "isDefault": false
+            }
+        },
+        {
+            "label": "Runserver",
+            "type": "shell",
+            "command": "source /home/rafa/Projects/Python/api-clima/api-clima/.venv/bin/activate; python /home/rafa/Projects/Python/api-clima/api-clima/manage.py runserver",
+            "problemMatcher": [],
+            "group": {
+                "kind": "build",
+                "isDefault": false
+            }
+        },
+        {
+            "label": "export dependences",
+            "type": "shell",
+            "command": "source /home/rafa/Projects/Python/api-clima/api-clima/.venv/bin/activate; pip freeze > requirements.txt",
+            "problemMatcher": [],
+            "group": {
+                "kind": "build",
+                "isDefault": false
+            }
+        },
+        {
+            "label": "debug",
+            "type": "shell",
+            "command": "cd /home/rafa/Projects/Python/api-clima/api-clima ; /usr/bin/env /home/rafa/Projects/Python/api-clima/api-clima/.venv/bin/python /home/rafa/.vscode/extensions/ms-python.debugpy-2024.10.0-linux-x64/bundled/libs/debugpy/adapter/../../debugpy/launcher 41809 -- /home/rafa/Projects/Python/api-clima/api-clima/manage.py runserver ",
+            "problemMatcher": [],
+            "group": {
+                "kind": "build",
+                "isDefault": false
+            }
+        }
+    ]
+}

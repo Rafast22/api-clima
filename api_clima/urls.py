@@ -17,9 +17,15 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 from api import views
+from api.Views import cultivo, client
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('users/', views.user_list),
     path('users/<int:pk>/', views.user_detail),
+    path('cultivos', cultivo.cultivo_list_by_client_id),
+    path('cultivos/<int:pk>/', cultivo.cultivo_detail),
+    path('client/cultivos/<int:pk>/', cultivo.cultivo_list_by_client_id),
+    path('client', client.client_list),
+    path('client/<int:pk>/', client.client_detail),
 
 ]
