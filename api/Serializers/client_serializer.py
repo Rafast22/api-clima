@@ -1,5 +1,6 @@
 from rest_framework import serializers
 from ..Models.client import Client
+from ..Serializers.cultivo_serializer import CultivoSerializer
 
 
 
@@ -8,7 +9,8 @@ class ClientSerializer(serializers.Serializer):
     id = serializers.IntegerField(required=False)
     create_date = serializers.DateTimeField(required=False)
     update_date = serializers.DateTimeField(required=False)
-    
+    cultivo = CultivoSerializer(read_only=True)
+    user_id = serializers.IntegerField()
     def create(self, validated_data):
         """
         Create and return a new `Client` instance, given the validated data.
@@ -29,3 +31,6 @@ class ClientSerializer(serializers.Serializer):
         
         instance.save()
         return instance
+    class Meta:
+        model = Client
+        fields= "__all__"

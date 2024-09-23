@@ -1,10 +1,12 @@
 from django.shortcuts import render
-from .serializers import UserSerializer
-from .models import User
+from .Serializers.user_serializer import UserSerializer
+from .Models.user import User
 from rest_framework.parsers import JSONParser
 from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
-
+from rest_framework.authtoken.views import ObtainAuthToken
+from rest_framework.authtoken.models import Token
+from rest_framework.permissions import IsAuthenticated
 @csrf_exempt
 def user_list(request):
     """
@@ -48,18 +50,5 @@ def user_detail(request, pk):
     elif request.method == 'DELETE':
         user.delete()
         return HttpResponse(status=204)
-@csrf_exempt
-def login():
-    pass
 
-@csrf_exempt
-def logout():
-    pass
 
-@csrf_exempt
-def get_token():
-    pass
-
-@csrf_exempt
-def refresh_token():
-    pass
