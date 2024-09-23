@@ -29,7 +29,9 @@ class User(AbstractUser):
     groups = models.ManyToManyField( Group, related_name='custom_user_set' )
 
     user_permissions = models.ManyToManyField(Permission, related_name='custom_user_set')
-
-    class Meta:
+    class Meta(AbstractUser.Meta):
+        swappable = "AUTH_USER_MODEL"
         ordering = ['date_joined']
+    
+        
 
