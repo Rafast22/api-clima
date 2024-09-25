@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from ..Serializers.user_serializer import UserSerializer
-from ..Models.user import User
+from ..models import User
 from rest_framework.parsers import JSONParser
 from django.http import HttpResponse, JsonResponse
 from django.contrib.auth import authenticate, login
