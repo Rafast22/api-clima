@@ -1,6 +1,6 @@
 from django.db import models
 #from ..models.Cultivo.model import Cultivo
-from .user import User
+from ..models import User
 
 
 class Client(models.Model):
