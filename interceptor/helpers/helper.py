@@ -1,4 +1,4 @@
-BASE_URL = "https://power.larc.nasa.gov/api/"
+BASE_URL = "https://power.larc.nasa.gov/api"
 START_DATE = "20240128"
 END_DATE = "20240128"
 

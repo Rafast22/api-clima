@@ -3,7 +3,7 @@ from ..Models.predict import Predict
 
 
 
-class PredictSerializer(serializers.Serializer):
+class PredictSerializer(serializers.ModelSerializer):
     
     date = serializers.DateTimeField(max_length=11, allow_blank=False) #serializers.DateTimeField(auto_now_add=True)
     RH2M = serializers.DecimalField(max_digits=10, max_decimal_places=3, null=True)

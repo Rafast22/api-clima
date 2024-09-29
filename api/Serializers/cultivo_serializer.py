@@ -2,7 +2,7 @@ from rest_framework import serializers
 from ..Models.cultivo import Cultivo
 
 
-class CultivoSerializer(serializers.Serializer):
+class CultivoSerializer(serializers.ModelSerializer):
     id = serializers.IntegerField(required=False)
     create_date  = serializers.DateTimeField(required=False)
     update_date = serializers.DateTimeField(required=False)

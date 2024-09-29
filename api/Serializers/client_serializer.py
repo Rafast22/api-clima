@@ -4,7 +4,7 @@ from ..Serializers.cultivo_serializer import CultivoSerializer
 
 
 
-class ClientSerializer(serializers.Serializer):
+class ClientSerializer(serializers.ModelSerializer):
     
     id = serializers.IntegerField(required=False)
     create_date = serializers.DateTimeField(required=False)

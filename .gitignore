@@ -16,3 +16,9 @@ api/Views/__pycache__/
 api/Views/__pycache__/*
 api/Serializers/__pycache__/
 api/Serializers/__pycache__/*
+interceptor/helpers/__pycache__/
+interceptor/helpers/__pycache__/*
+interceptor/interfaces/__pycache__/
+interceptor/interfaces/__pycache__/*
+interceptor/__pycache__/
+interceptor/__pycache__/*

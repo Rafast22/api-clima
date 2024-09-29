@@ -10,9 +10,6 @@ def cultivo_list_by_client_id(request, pk=0):
     """
     List all code cultivo, or create a new cultivo.
     """
-    
-
-    
     if request.method == 'GET':
         cultivo = Cultivo.objects.all()
         serializer = CultivoSerializer(cultivo, many=True)
