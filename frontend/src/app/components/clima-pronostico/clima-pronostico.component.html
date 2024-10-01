@@ -1,0 +1,47 @@
+<!-- <h2 class="pl-4">{{ "weather_forecast." + forecastType() | translate }}</h2>
+    <swiper-container navigation="true" space-between="16" [slidesPerView]="slidesPerView">
+      @if (loaderService.isLoading$ | async) {
+        @for (item of [1, 2, 3, 4, 5, 6, 7]; track $index) {
+          <swiper-slide
+            class=" flex flex-column justify-content-between h-25rem border-1 border-primary border-round py-5 px-4"
+            style="background-color: transparent"
+          >
+          </swiper-slide>
+        }
+      } @else {
+        @for (item of dataInput(); track $index) {
+          <swiper-slide
+            class=" flex flex-column justify-content-between h-28rem border-1 border-primary border-round py-1 px-1 xl:py-5 xl:px-3"
+            style="background-color: transparent"
+          >
+            @if (forecastType() === "hourly") {
+              <p class="text-center">
+                {{ item.dt | UnixTimestamp | date: unitsService.formatTime() }} |
+                {{ item.dt | UnixTimestamp | date: "MMMM dd" }}
+              </p>
+            } @else {
+              <p class="text-center">{{ item.dt | UnixTimestamp | date: "EEEE, MMMM dd" }}</p>
+            }
+            <img
+              class="w-full"
+              [src]="
+                iconsService.searchWeatherIcon(item.weather[0].id, true)
+                  | IconDynamic: iconsService.iconsFolder()
+              "
+              [alt]="'icono de ' + item.weather[0].main"
+            />
+            <p class="text-center">{{ item.wind_speed | speedUnit: unitsService.speedUnit() }}</p>
+            <p class="text-center">
+              {{
+                (forecastType() === "hourly" ? item.temp : item.temp.day)
+                  | temperatureUnit: unitsService.temperatureUnit()
+              }}
+            </p>
+            <p class="text-center capitalize">
+              {{ "weather_description." + item.weather[0].id | translate }}
+            </p>
+          </swiper-slide>
+        }
+      }
+    </swiper-container>
+   -->

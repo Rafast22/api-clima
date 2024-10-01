@@ -1,0 +1,12 @@
+.example-spacer {
+    flex: 1 1 auto;
+  }
+  .tema-dark {
+    background-color: #282A36;
+    color: #F8F8F2;
+  }
+  .dark{
+    background-color:  #44475A;
+  }
+
+  
