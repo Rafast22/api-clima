@@ -30,7 +30,7 @@ urlpatterns = [
     path('client/cultivos/<int:pk>/', cultivo.cultivo_list_by_client_id),
     path('client', client.ClientList.as_view()),
     path('client/<int:pk>/', client.client_detail),
-    path('localidad/<int:pk>/', client.client_detail),
+    path('localidad', client.client_detail),
     path('localidad/<int:pk>/', client.client_detail),
 
 ]
