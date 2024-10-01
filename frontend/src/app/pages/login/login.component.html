@@ -1,0 +1,48 @@
+<div class="caixa">
+  <div class="caixa-login caixa-login-two">
+    <div class="area-de-login area-de-login-two">
+      <h2 class="primeiro-titulo">Bienvenido!</h2>
+      <p class="p-titulo1">Crea su cuenta y comienza a navegar</p>
+      <p></p>
+      <button class="botao-entrar" (click)="btnInscrever()" >Registrarme</button>
+    </div>
+    <div class="criar-login criar-login-two">
+      <h2 class="segundo-titulo">Acceder a mi cuenta</h2>
+      <div class="icones-gerais">
+        <div class="icones-redes">
+          <!-- <span><i class="fa-brands fa-facebook-f"></i></span> -->
+          <mat-icon class="fa-brands fa-facebook-f">facebook</mat-icon>
+        </div>
+        <div class="icones-redes">
+          <!-- <span><i class="fa-brands fa-google-plus-g"></i></span> -->
+          <mat-icon svgIcon="google"></mat-icon>
+        </div>
+        <!-- <div class="icones-redes">
+        <span><i class="fa-brands fa-linkedin-in"></i></span> 
+          <mat-icon icon="mdi:linkedin">linkedin</mat-icon>
+        </div> -->
+      </div>
+      <p class="p-titulo2">O acceder con:</p>
+      <form class="form" (ngSubmit)="login()" [formGroup]="formLogar">
+        <label  class="form-login" for="email">
+          <i class="far fa-user icon-modify"></i>
+          <input type="text" id="email" placeholder="E-mail" formControlName="email">
+        </label>
+        <span *ngIf="(formLogar.get('email')?.touched || submetido) && formLogar.get('email')?.errors?.['required']">
+          Campo obrigatório
+        </span>
+        <label class="form-login" for="senha">
+          <i class="fas fa-lock icon-modify"></i>
+          <input type="password" id="senha" placeholder="Contraseña" formControlName="senha">
+        </label>
+        <span *ngIf="(formLogar.get('senha')?.touched || submetido) && formLogar.get('senha')?.errors?.['required']">
+          Campo obrigatório
+        </span>
+        <span>{{mensagemErro}}</span>
+        <br>
+        <h4>Olvidaste tu contraseña?</h4>
+        <button type="submit" class="botao-form">Entrar</button>
+      </form>
+    </div>
+  </div>
+</div>

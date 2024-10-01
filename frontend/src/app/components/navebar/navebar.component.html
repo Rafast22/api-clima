@@ -1,0 +1,65 @@
+<mat-toolbar color="" class="mat-elevation-z8 tema-dark">
+    <button (click)="drawer.toggle()" mat-icon-button>
+        <mat-icon>menu</mat-icon>
+    </button>
+    <span>Prediccion Climatica (IA)</span> 
+    <span class="example-spacer"></span>
+    <button routerLink="" mat-button>Home</button>
+    <button [matMenuTriggerFor]="lvl1master" mat-button>Registrar Cultivo</button>
+    <mat-menu #lvl1master="matMenu">
+        <!-- <button [matMenuTriggerFor]="siembra" mat-menu-item>Siembra</button>
+        <button [matMenuTriggerFor]="cosecha" mat-menu-item>Cosecha</button> -->
+        <button routerLink="card" mat-menu-item><mat-icon>add</mat-icon>Siembra </button>
+        <button routerLink="card" mat-menu-item><mat-icon>add</mat-icon>Cosecha</button>
+       
+    </mat-menu>
+    <!-- <mat-menu #siembra="matMenu">
+        <button mat-menu-item>Term</button>
+        <button mat-menu-item>Tax</button>
+        <button mat-menu-item>Currency</button>
+    </mat-menu>
+    <mat-menu #cosecha="matMenu">
+        <button mat-menu-item>Type</button>
+        <button mat-menu-item>Tax</button>
+    </mat-menu> -->
+    <mat-menu #variant="matMenu">
+        <button mat-menu-item>Color</button>
+        <button mat-menu-item>Size</button>
+    </mat-menu>
+    <button (click)="badgevisibility()"  mat-icon-button>
+        <mat-icon matBadgeColor="accent" matBadge="15" [matBadgeHidden]="badgevisible" matBadgeSize="small">notifications</mat-icon>
+    </button>
+</mat-toolbar>
+<mat-drawer-container autosize>
+    <mat-drawer #drawer opened="true" mode="side" position="start" class="dark">
+    <mat-nav-list>
+        <mat-list-item>
+            <button routerLink="card" mat-button style="color:#F8F8F2;"><mat-icon>dashboard</mat-icon>Menu</button>
+        </mat-list-item>
+        <mat-list-item>
+            <button routerLink="" mat-button style="color:#F8F8F2"><mat-icon>cloud</mat-icon> Clima</button>
+        </mat-list-item>
+        <mat-list-item>
+            <button mat-button [matMenuTriggerFor]="cultivo" style="color: #F8F8F2;"><mat-icon>add</mat-icon> Registrar Cultivo</button>
+            <mat-menu #cultivo="matMenu">
+                <button mat-menu-item>Cosecha</button>
+                <button mat-menu-item>Cultivo</button>
+                <button mat-menu-item>Siembra</button>
+            </mat-menu>
+        </mat-list-item>
+        <mat-list-item>
+            <button mat-button style="color: #F8F8F2;"><mat-icon>settings</mat-icon> Configuracion</button>
+        </mat-list-item>
+        <mat-list-item>
+            <button mat-button style="color: #F8F8F2;"><mat-icon>help</mat-icon> Ayuda</button>
+        </mat-list-item>
+    </mat-nav-list>
+
+    </mat-drawer>
+    <mat-drawer-content>
+        <div style="text-align: center;min-height: 600px;">
+            
+            <router-outlet></router-outlet>
+            </div>
+    </mat-drawer-content>
+</mat-drawer-container>

@@ -1,0 +1,40 @@
+<div class="flex justify-content-between h-23rem border-1 border-primary border-round p-3 md:p-5">
+    @if (loaderService.isLoading$ | async) {
+      <div class="flex w-full">
+        <div class="col-6">     
+        </div>
+        <div class="col-6">
+        </div>
+      </div>
+    } @else {
+      <div class="w-50">
+        <p class="text-6xl md:text-8xl white-space-nowrap m-0">
+          {{ data().current.temp | temperatureUnit: this.unitsService.temperatureUnit() }}
+        </p>
+        <p class="text-lg font-light text-color-secondary">
+          {{ currentDate | date: "EEEE, MMMM d" }}
+        </p>
+        <h1 class="text-2xl font-semibold">{{ geoData().country_name }}, {{ geoData().city }}</h1>
+        <p class="text-lg font-light text-color-secondary">
+          {{ "weather_current.today"  }} -
+          {{ "weather_description." + data().current.weather[0].id  }}
+          <br />
+          {{ "weather_current.temp_max"  }}
+          {{ data().daily[0].temp.max | temperatureUnit: this.unitsService.temperatureUnit() }},
+          {{ "weather_current.temp_min"  }}
+          {{ data().daily[0].temp.min | temperatureUnit: this.unitsService.temperatureUnit() }}.
+        </p>
+      </div>
+      <div class="w-50 flex justify-content-end">
+        <img
+          class="w-full"
+          [src]="
+            iconsService.searchWeatherIcon(data().current.weather[0].id)
+              | IconDynamic: iconsService.iconsFolder()
+          "
+          [alt]="'icono de ' + data().current.weather[0].main"
+        />
+      </div>
+    }
+  </div>
+  
