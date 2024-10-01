@@ -6,7 +6,7 @@
         {
             "label": "Makemigtarions",
             "type": "shell",
-            "command": "source /home/rafa/Projects/Python/api-clima/api-clima/.venv/bin/activate; python /home/rafa/Projects/Python/api-clima/api-clima/manage.py makemigrations",
+            "command": " ${workspaceFolder}/.venv/bin/python ${workspaceFolder}/manage.py makemigrations",
             "problemMatcher": [],
             "group": {
                 "kind": "build",
@@ -16,7 +16,7 @@
         {
             "label": "Migrate",
             "type": "shell",
-            "command": "source /home/rafa/Projects/Python/api-clima/api-clima/.venv/bin/activate; python /home/rafa/Projects/Python/api-clima/api-clima/manage.py migrate",
+            "command": "${workspaceFolder}/.venv/bin/python ${workspaceFolder}/manage.py migrate",
             "problemMatcher": [],
             "group": {
                 "kind": "build",
@@ -26,7 +26,7 @@
         {
             "label": "Runserver",
             "type": "shell",
-            "command": "source /home/rafa/Projects/Python/api-clima/api-clima/.venv/bin/activate; python /home/rafa/Projects/Python/api-clima/api-clima/manage.py runserver",
+            "command": "${workspaceFolder}/.venv/bin/python ${workspaceFolder}/manage.py runserver",
             "problemMatcher": [],
             "group": {
                 "kind": "build",
@@ -36,17 +36,7 @@
         {
             "label": "export dependences",
             "type": "shell",
-            "command": "source /home/rafa/Projects/Python/api-clima/api-clima/.venv/bin/activate; pip freeze > requirements.txt",
-            "problemMatcher": [],
-            "group": {
-                "kind": "build",
-                "isDefault": false
-            }
-        },
-        {
-            "label": "debug",
-            "type": "shell",
-            "command": "cd /home/rafa/Projects/Python/api-clima/api-clima ; /usr/bin/env /home/rafa/Projects/Python/api-clima/api-clima/.venv/bin/python /home/rafa/.vscode/extensions/ms-python.debugpy-2024.10.0-linux-x64/bundled/libs/debugpy/adapter/../../debugpy/launcher 41809 -- /home/rafa/Projects/Python/api-clima/api-clima/manage.py runserver ",
+            "command": "${workspaceFolder}/.venv/bin/pip freeze > requirements.txt",
             "problemMatcher": [],
             "group": {
                 "kind": "build",
