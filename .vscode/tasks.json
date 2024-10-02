@@ -1,0 +1,44 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "run-api",
+			"type": "shell",
+			"command": " ${workspaceFolder}/api/.venv/bin/python ${workspaceFolder}/api/manage.py makemigrations",
+			"problemMatcher": [],
+			"group": {
+				"kind": "build",
+				"isDefault": false
+			}
+		},
+		{
+			"label": "serve angular",
+			"type": "shell",
+			"command": "node ${workspaceFolder}/frontend/node_modules/@angular/cli/bin/ng.js serve",
+			"problemMatcher": [],
+			"group": {
+				"kind": "build",
+				"isDefault": false
+			}
+		},
+		{
+			"type": "npm",
+			"script": "build",
+			"path": "frontend",
+			"group": "build",
+			"problemMatcher": [],
+			"label": "npm: build - frontend",
+			"detail": "ng build"
+		},
+		{
+			"label": "install-dependences",
+			"type": "shell",
+			"command": "cd ${workspaceFolder}/frontend; npm i",
+			"problemMatcher": [],
+			"group": {
+				"kind": "build",
+				"isDefault": false
+			}
+		}
+	]
+}
