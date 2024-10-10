@@ -49,8 +49,7 @@ class User(AbstractUser):
     role = models.CharField(max_length=15, choices=ROLE_CHOICES, null=False, default="user")
     # date_joined =  models.DateTimeField(auto_now_add=True)
     last_login =  models.DateTimeField( auto_now=True)
-    password = models.CharField(_("password"), max_length=128)
-    last_login = models.DateTimeField(_("last login"), blank=True, null=True)
+    
     # groups = models.ManyToManyField( Group, related_name='custom_user_set' )
 
     # user_permissions = models.ManyToManyField(Permission, related_name='custom_user_set')

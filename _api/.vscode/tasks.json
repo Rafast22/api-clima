@@ -4,43 +4,23 @@
     "version": "2.0.0",
     "tasks": [
         {
-            "label": "Makemigtarions",
+            "label": "Update requirements.txt",
             "type": "shell",
-            "command": " ${workspaceFolder}/.venv/bin/python ${workspaceFolder}/manage.py makemigrations",
+            "command": "source ${workspaceFolder}/.env/bin/activate; pip freeze > ${workspaceFolder}/requirements.txt",
             "problemMatcher": [],
             "group": {
-                "kind": "build",
-                "isDefault": false
+                "kind": "build"
+                
             }
         },
         {
-            "label": "Migrate",
+            "label": "Run server",
             "type": "shell",
-            "command": "${workspaceFolder}/.venv/bin/python ${workspaceFolder}/manage.py migrate",
+            "command": "source ${workspaceFolder}/.env/bin/activate; uvicorn app.main:app --reload",
             "problemMatcher": [],
             "group": {
-                "kind": "build",
-                "isDefault": false
-            }
-        },
-        {
-            "label": "Runserver",
-            "type": "shell",
-            "command": "${workspaceFolder}/.venv/bin/python ${workspaceFolder}/manage.py runserver",
-            "problemMatcher": [],
-            "group": {
-                "kind": "build",
-                "isDefault": false
-            }
-        },
-        {
-            "label": "export dependences",
-            "type": "shell",
-            "command": "${workspaceFolder}/.venv/bin/pip freeze > requirements.txt",
-            "problemMatcher": [],
-            "group": {
-                "kind": "build",
-                "isDefault": false
+                "kind": "build"
+                
             }
         }
     ]

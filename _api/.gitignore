@@ -1,0 +1,6 @@
+migrations
+.env
+app/_models/__pycache__
+app/__pycache__
+app/_view/__pycache__
+app/routers/__pycache__
