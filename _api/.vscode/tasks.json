@@ -1,0 +1,27 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Update requirements.txt",
+            "type": "shell",
+            "command": "source ${workspaceFolder}/.env/bin/activate; pip freeze > ${workspaceFolder}/requirements.txt",
+            "problemMatcher": [],
+            "group": {
+                "kind": "build"
+                
+            }
+        },
+        {
+            "label": "Run server",
+            "type": "shell",
+            "command": "source ${workspaceFolder}/.env/bin/activate; uvicorn --workers 3 --host 0.0.0.0 app.main:app --reload",
+            "problemMatcher": [],
+            "group": {
+                "kind": "build"
+                
+            }
+        }
+    ]
+}
