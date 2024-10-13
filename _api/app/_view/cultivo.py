@@ -49,3 +49,12 @@ def get_by_user_id(db: Session, user_id:int ) -> RequestCultivo:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
     return db_cultivo
 
+def create(db: Session, u: RequestCultivoCreate) -> RequestCultivo:
+    db_cultivo = cultivo.create_cultivo(db, u.id)
+
+    return db_cultivo
+
+    # if not db_cultivo:
+    #     raise HTTPException(status_code=404, detail="Usuário não encontrado")
+    # return db_cultivo
+

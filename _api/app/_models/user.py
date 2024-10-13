@@ -36,7 +36,7 @@ class User(Base):
     last_login = Column(DateTime, index=True, onupdate=func.now())
     date_joined = Column(DateTime, index=True, server_default=func.now())
     role = Column(String, index=True, default="User")
-    cultivos = relationship("Cultivos", back_populates="user", cascade="all, delete-orphan")
+    # cultivos = relationship("Cultivos", back_populates="user", cascade="all, delete-orphan")
     
     
 

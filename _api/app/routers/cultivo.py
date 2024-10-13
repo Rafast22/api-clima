@@ -1,12 +1,7 @@
 from fastapi import Depends, APIRouter, HTTPException, status
-from fastapi.responses import RedirectResponse
-from fastapi.security import OAuth2PasswordRequestForm
 from typing import Union, Annotated
-from .._schemas.user import RequestUserCreate, RequestUser
-from .._models.auth import decode_token
-from .._models.user import User
-from .._view.cultivo import update, get_by_id, delete_cultivo, get_by_user_id
-from ..database import oauth2_scheme
+from .._schemas.cultivo import RequestCultivo, RequestCultivoCreate
+from .._view.cultivo import update, get_by_id, delete_cultivo, get_by_user_id, create
 from ..database import get_db
 from .._view.auth import is_user_autenticate, get_current_user
 from sqlalchemy.orm import Session
@@ -14,9 +9,13 @@ from sqlalchemy.orm import Session
 
 router = APIRouter()
 
+@router.post("/user/cultivo")
+async def create_localidad(cultivo: RequestCultivoCreate, is_autenticate: Annotated[bool, Depends(is_user_autenticate)], db: Session = Depends(get_db)):
+    create(db, cultivo)
+
 @router.put("/user/cultivo")
-async def put_user(user: Annotated[RequestUser, Depends()], is_autenticate: Annotated[bool, Depends(is_user_autenticate)], db: Session = Depends(get_db)):
-    return update(db, is_autenticate, user)
+async def put_user(user: Annotated[RequestCultivo, Depends()], is_autenticate: Annotated[bool, Depends(is_user_autenticate)], db: Session = Depends(get_db)):
+    return update(db, user)
     
 @router.get("/user/cultivo/{cultivo_id}")
 async def get_user(cultivo_id: int, is_autenticate: Annotated[bool, Depends(is_user_autenticate)], db: Session = Depends(get_db)):

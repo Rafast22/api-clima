@@ -1,5 +1,6 @@
 
 import re, datetime
+import pandas as pd
 class Data:
     def __init__(self, data):
         self.type = data["type"]
@@ -44,7 +45,25 @@ class Data:
                     
         return dictionary
         
-            
+def format_data(data: Data) -> list:
+    """
+    Converts Data object to a list of dictionaries suitable for RequestData.
+
+    Args:
+        data (Data): The Data object to be formatted.
+
+    Returns:
+        list: A list of dictionaries ready for use with RequestData.
+    """
+
+    dictionary = []
+    for parameter, value_dict in data.parameters.items():
+        for date, value in value_dict.items():
+            formatted_data = {"date": date}
+            formatted_data[parameter] = value
+            dictionary.append(formatted_data)
+
+    return dictionary
 class Parameter():
     def __init__(self, PRECTOTCORR=None ,RH2M=None ,QV2M=None ,T2M=None ,WS2M=None):
         self.PRECTOTCORR = PRECTOTCORR

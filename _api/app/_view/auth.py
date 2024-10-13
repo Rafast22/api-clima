@@ -123,6 +123,6 @@ def login(form_data: OAuth2PasswordRequestForm, db: Session) -> RequestToken:
     response = RequestToken(access_token=access_token, token_type="bearer")
     return response
 
-def logout():
+def logout(current_user:User = Depends(oauth2_scheme), db: Session = Depends(get_db)):
     pass
     

@@ -1,14 +1,10 @@
 from fastapi import Depends, APIRouter, HTTPException, status
-from fastapi.responses import RedirectResponse
-from fastapi.security import OAuth2PasswordRequestForm
 from typing import Union, Annotated
 from .._schemas.user import RequestUserCreate, RequestUser
-from .._models.auth import decode_token
 from .._models.user import User
 from .._view.user import update, get_by_id, delete_user
-from ..database import oauth2_scheme
 from ..database import get_db
-from .._view.auth import is_user_autenticate, get_current_user
+from .._view.auth import is_user_autenticate
 from sqlalchemy.orm import Session
 
 
