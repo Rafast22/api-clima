@@ -22,3 +22,7 @@ interceptor/interfaces/__pycache__/
 interceptor/interfaces/__pycache__/*
 interceptor/__pycache__/
 interceptor/__pycache__/*
+dist
+dist/*
+.angular
+.angular/*
