@@ -25,18 +25,18 @@
       </div>
       <p class="p-titulo2">O acceder con:</p>
       <form class="form" (ngSubmit)="login()" [formGroup]="formLogar">
-        <label  class="form-login" for="email">
+        <label  class="form-login" for="username">
           <i class="far fa-user icon-modify"></i>
-          <input type="text" id="email" placeholder="E-mail" formControlName="email">
+          <input type="text" id="username" placeholder="E-mail" formControlName="username">
         </label>
-        <span *ngIf="(formLogar.get('email')?.touched || submetido) && formLogar.get('email')?.errors?.['required']">
+        <span *ngIf="(formLogar.get('username')?.touched || submetido) && formLogar.get('username')?.errors?.['required']">
           Campo obrigatório
         </span>
-        <label class="form-login" for="senha">
+        <label class="form-login" for="password">
           <i class="fas fa-lock icon-modify"></i>
-          <input type="password" id="senha" placeholder="Contraseña" formControlName="senha">
+          <input type="password" id="password" placeholder="Contraseña" formControlName="password">
         </label>
-        <span *ngIf="(formLogar.get('senha')?.touched || submetido) && formLogar.get('senha')?.errors?.['required']">
+        <span *ngIf="(formLogar.get('password')?.touched || submetido) && formLogar.get('password')?.errors?.['required']">
           Campo obrigatório
         </span>
         <span>{{mensagemErro}}</span>

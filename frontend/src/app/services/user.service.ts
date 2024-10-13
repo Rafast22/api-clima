@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from "@angular/common/http";
+import { HttpClient, HttpHeaders, HttpParams } from "@angular/common/http";
 
 
 @Injectable({
@@ -7,19 +7,35 @@ import { HttpClient } from "@angular/common/http";
 })
 export class UserService {
 
-  private apany = 'http://localhost:3000/usuario'
+  private baseUrl = 'http://192.168.0.29:8000/'
 
   constructor(private http: HttpClient) { }
 
   cadastrar(usuario: any) {
-    return this.http.post<any>(this.apany, usuario)
+    return this.http.post<any>(this.baseUrl, usuario)
   }
 
-   async login(cuenta: any):Promise<boolean> {
-    if(cuenta.email === "adrianaacosta.mv562@gmail.com" && cuenta.password === "Lmtz6404@"){
-      return true;
-    }
-    return false;
+   async login(usuario: Usuario):Promise<boolean> {
+    
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/x-www-form-urlencoded'  
+
+    });
+    let ret:boolean=false
+    const body = new HttpParams()
+      .set('grant_type', 'password')
+      .set('username', usuario.username)
+      .set('password', usuario.password) 
+
+      .set('client_id', 'string') // Replace with your client ID
+      .set('client_secret', 'string'); 
+      await this.http.post(`${this.baseUrl}login`, body.toString(), { headers }).toPromise().then(r =>{
+      ret=true
+    })
+    .catch(error => {
+      ret=false
+    })
+    return ret
   }
 
   getUsuarios() {
@@ -33,8 +49,24 @@ export class UserService {
   }
 
   editarUsuario(usuario: any) {
-    return this.http.put<any>(`${this.apany}/${usuario.id}`, usuario)
+    return this.http.put<any>(`${this.baseUrl}/${usuario.id}`, usuario)
   }
 
  
+}
+
+class Usuario{
+  username:string;
+  password:string;
+  grant_type='password';
+  scope=""
+  client_id='string'
+  client_secret='string'
+  constructor(username:string, password:string){
+    this.username = username;
+    this.password = password;
+    this.grant_type = 'password'
+    this.client_id = 'string'
+    this.client_secret = 'string'
+  }
 }
