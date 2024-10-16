@@ -39,8 +39,8 @@ export class LoginComponent implements OnInit {
 
   ngOnInit(): void {
     this.formLogar = this.fb.group({
-      email: ['',[ Validators.required]],
-      senha: ['', [Validators.required]]
+      username: ['',[ Validators.required]],
+      password: ['', [Validators.required]]
     })
   }
   btnInscrever(){
@@ -54,7 +54,7 @@ export class LoginComponent implements OnInit {
       await this.service.login(form).then((resposta : boolean)=>{
         console.log (resposta)
         if(resposta){
-          this.route.navigateByUrl("")
+          this.route.navigateByUrl("principal")
         }else{
             this.mensagemErro = 'Usuario o Contrasenha incorrecta'
             console.log(this.mensagemErro)
