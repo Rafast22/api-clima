@@ -1,4 +1,4 @@
-import { ICONS_DICTIONARY } from "../utils/diccionario/icons.dictionary";
+import { ICONS_DICTIONARY } from "../../utils/diccionario/icons.dictionary";
 
 export interface IListIcons {
   code: number;

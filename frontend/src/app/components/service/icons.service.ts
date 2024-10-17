@@ -1,14 +1,13 @@
 import { Injectable, inject, signal } from "@angular/core";
 import { HttpClient } from "@angular/common/http";
 import { LocalStorageService } from "./local-storage.service";
-import {
-  IconConfig,
-  TWeatherIconsAnimations,
-  TWeatherIconsFolder,
-  TWeatherIconsType,
-} from "../interfaces/icones";
+
 import { environment } from "../../environments/environment.development";
 import { iconsList } from "../data/weather-icons.data";
+import { IconConfig,
+  TWeatherIconsAnimations,
+  TWeatherIconsFolder,
+  TWeatherIconsType } from "../interfaces/utils.inteface/icones";
 
 /**
  * This service stores user preferences regarding icons, allowing a switch between

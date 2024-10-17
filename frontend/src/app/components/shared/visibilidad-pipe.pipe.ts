@@ -1,6 +1,6 @@
 import { Pipe, type PipeTransform } from "@angular/core";
-import { TVisibility } from '../interfaces/formatos';
-import { UNITS_DICTIONARY } from '../interfaces/utils';
+import { UNITS_DICTIONARY } from "../utils/diccionario/units.dictionary";
+import { TVisibility } from "../interfaces/utils.inteface/formatos";
 
 /**
  * A pipe that transforms visibility distance from meters to kilometers or miles.

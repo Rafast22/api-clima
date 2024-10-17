@@ -1,4 +1,4 @@
-import { IListIcons } from "../interfaces/icones";
+import { IListIcons } from "../interfaces/utils.inteface/icones";
 
 export const iconsList: IListIcons[] = [
   {

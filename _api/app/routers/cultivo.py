@@ -9,24 +9,24 @@ from sqlalchemy.orm import Session
 
 router = APIRouter()
 
-@router.post("/user/cultivo")
+@router.post("/api/user/cultivo")
 async def create_localidad(cultivo: RequestCultivoCreate, is_autenticate: Annotated[bool, Depends(is_user_autenticate)], db: Session = Depends(get_db)):
     create(db, cultivo)
 
-@router.put("/user/cultivo")
+@router.put("/api/user/cultivo")
 async def put_user(user: Annotated[RequestCultivo, Depends()], is_autenticate: Annotated[bool, Depends(is_user_autenticate)], db: Session = Depends(get_db)):
     return update(db, user)
     
-@router.get("/user/cultivo/{cultivo_id}")
+@router.get("/api/user/cultivo/{cultivo_id}")
 async def get_user(cultivo_id: int, is_autenticate: Annotated[bool, Depends(is_user_autenticate)], db: Session = Depends(get_db)):
     return get_by_id(db, cultivo_id)
 
-@router.get("/user/cultivo/{user_id}")
+@router.get("/api/user/cultivo/{user_id}")
 async def get_user(user_id: int, is_autenticate: Annotated[bool, Depends(is_user_autenticate)], db: Session = Depends(get_db)):
     return get_by_user_id(db, user_id)
     
 
-@router.delete("/user/cultivo/{cultivo_id}")
+@router.delete("/api/user/cultivo/{cultivo_id}")
 async def get_user(cultivo_id: int, is_autenticate: Annotated[bool, Depends(is_user_autenticate)], db: Session = Depends(get_db)):
     delete_cultivo(db, cultivo_id)
     

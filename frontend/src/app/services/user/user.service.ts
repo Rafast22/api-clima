@@ -27,7 +27,7 @@ export class UserService {
       .set('username', usuario.username)
       .set('password', usuario.password) 
 
-      .set('client_id', 'string') // Replace with your client ID
+      .set('client_id', 'string') 
       .set('client_secret', 'string'); 
       await this.http.post(`${this.baseUrl}login`, body.toString(), { headers }).toPromise().then(r =>{
       ret=true

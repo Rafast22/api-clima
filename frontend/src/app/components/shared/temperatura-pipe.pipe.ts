@@ -1,6 +1,7 @@
 import { Pipe, type PipeTransform } from "@angular/core";
-import { TTemperature } from '../interfaces/formatos';
-import { UNITS_DICTIONARY } from '../interfaces/utils';
+import { TTemperature } from "../interfaces/utils.inteface/formatos";
+import { UNITS_DICTIONARY } from "../utils/diccionario/units.dictionary";
+
 
 /**
  * A pipe that transforms temperature values into degrees Fahrenheit.

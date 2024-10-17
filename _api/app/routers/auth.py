@@ -14,11 +14,11 @@ from ..database import get_db
 router = APIRouter()
 
 
-@router.post("/login")
+@router.post("/api/login")
 async def login(form_data: Annotated[OAuth2PasswordRequestForm, Depends()], db: Session = Depends(get_db)):
     return auth.login(form_data, db)
 
-@router.post("/register")
+@router.post("/api/register")
 async def register(form_data: Annotated[RequestUserCreate, Depends()], db: Session = Depends(get_db)):
     return auth.register(form_data, db)
 

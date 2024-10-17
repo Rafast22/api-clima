@@ -1,11 +1,14 @@
-from fastapi import FastAPI, APIRouter
+from fastapi import FastAPI, APIRouter, Request
 from .routers import test, user, auth, cultivo, localidad
 from fastapi.responses import RedirectResponse
 from .database import create_database,Base,engine
 from contextlib import asynccontextmanager
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.templating import Jinja2Templates
+from fastapi.staticfiles import StaticFiles
 
 router = APIRouter()
+templates = Jinja2Templates(directory="/home/rafa/Projects/Python/api-clima/frontend/dist/front/browser/")
 
 origins = [
 #     "http://localhost.tiangolo.com",
@@ -24,9 +27,12 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(lifespan=lifespan)    
+app.mount("/static", StaticFiles(directory="../frontend/dist/front/browser/"), name="static")
+
 @router.get("/")
-async def root():
-    return RedirectResponse("/docs")
+async def root(request: Request):
+    
+    return templates.TemplateResponse("index.html", {"request": request})
 app.include_router(router)
 app.include_router(auth.router)
 app.include_router(test.router)

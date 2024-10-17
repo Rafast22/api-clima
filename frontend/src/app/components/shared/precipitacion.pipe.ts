@@ -1,6 +1,7 @@
 import { Pipe, PipeTransform } from '@angular/core';
-import { TPrecipitation } from '../interfaces/formatos';
-import { UNITS_DICTIONARY } from '../interfaces/utils';
+import { TPrecipitation } from '../interfaces/utils.inteface/formatos';
+import { UNITS_DICTIONARY } from '../interfaces/utils.inteface/utils';
+
 
 @Pipe({
   name: 'precipitacion',

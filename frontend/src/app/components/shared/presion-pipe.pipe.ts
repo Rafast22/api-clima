@@ -1,6 +1,7 @@
 import { Pipe, type PipeTransform } from "@angular/core";
-import { TPressure } from '../interfaces/formatos';
-import { UNITS_DICTIONARY } from '../interfaces/utils';
+import { TPressure } from "../interfaces/utils.inteface/formatos";
+import { UNITS_DICTIONARY } from "../interfaces/utils.inteface/utils";
+
 /**
  * A pipe that transforms pressure values into different units.
  */

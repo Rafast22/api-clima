@@ -1,0 +1,26 @@
+{
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"type": "typescript",
+			"tsconfig": "tsconfig.spec.json",
+			"option": "watch",
+			"problemMatcher": [
+				"$tsc-watch"
+			],
+			"group": "build",
+			"label": "tsc: inspección: tsconfig.spec.json"
+		},
+		{
+            "label": "Run server",
+            "type": "shell",
+            "command": "source ${workspaceFolder}/../_api/.env/bin/activate; cd ${workspaceFolder}/../_api; uvicorn --host 0.0.0.0 app.main:app",
+			// --workers 3 
+            "problemMatcher": [],
+            "group": {
+                "kind": "build"
+                
+            }
+        }
+	]
+}

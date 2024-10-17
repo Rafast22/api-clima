@@ -1,6 +1,7 @@
 import { Pipe, type PipeTransform } from "@angular/core";
-import { TSpeed } from '../interfaces/formatos';
-import { UNITS_DICTIONARY } from '../interfaces/utils';
+import { UNITS_DICTIONARY } from "../utils/diccionario/units.dictionary";
+import { TSpeed } from "../interfaces/utils.inteface/formatos";
+
 /**
  * A pipe that transforms speed values into different units.
  */

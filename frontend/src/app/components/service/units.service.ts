@@ -1,6 +1,7 @@
 import { Injectable, inject, signal } from "@angular/core";
 import { LocalStorageService } from "./local-storage.service";
-import { TFormatTime, TPrecipitation, TPressure, TSpeed, TTemperature, TVisibility } from "../interfaces/formatos";
+import { TFormatTime, TPrecipitation, TPressure, TSpeed, TTemperature, TVisibility } from "../interfaces/utils.inteface/formatos";
+
 
 /**
  * A service that provides unit preferences functionality.

@@ -1,6 +1,6 @@
 import { Pipe, type PipeTransform } from "@angular/core";
-import { TWeatherIconsFolder } from "../interfaces/icones";
 import { ICONS_DICTIONARY } from "../utils/diccionario/icons.dictionary";
+import { TWeatherIconsFolder } from "../interfaces/utils.inteface/icones";
 /**
  * A pipe that dynamically generates the path to icon assets
  * based on the specified icon type.
