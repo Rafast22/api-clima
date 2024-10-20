@@ -57,8 +57,8 @@ class RequestUserCreate(RequestUserBase):
 
 class RequestUser(RequestUserBase):
     id: int 
-    last_login: datetime
-    date_joined: datetime
+    last_login: datetime | None
+    date_joined: datetime | None
     cultivos:list[RequestCultivo] = []
     
 

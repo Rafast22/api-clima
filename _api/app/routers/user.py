@@ -12,7 +12,7 @@ router = APIRouter()
 
 @router.put("/api/user")
 async def put_user(user: Annotated[RequestUser, Depends()], is_autenticate: Annotated[bool, Depends(is_user_autenticate)], db: Session = Depends(get_db)):
-    return update(db, is_autenticate, user)
+    return update(db, user)
     
 @router.get("/api/user/{user_id}")
 async def get_user(user_id: int, is_autenticate: Annotated[bool, Depends(is_user_autenticate)], db: Session = Depends(get_db)):

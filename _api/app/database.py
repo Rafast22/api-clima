@@ -6,7 +6,7 @@ from passlib.context import CryptContext
 
 SQLALCHEMY_DATABASE_URL = "sqlite:///./sql_app.db"
 # SQLALCHEMY_DATABASE_URL = "postgresql://user:password@postgresserver/db"
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="login")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="api/login")
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 SECRET_KEY = "8b5a1650bd34eda3385b11cc27ba36e783ec966e3cb5ca38e96bad77d417569cc33c9d2be10f470b32b277067623ccbe577f00228710bbbe3744197d4f92"
 ALGORITHM = "HS256"

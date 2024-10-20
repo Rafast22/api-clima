@@ -3,7 +3,7 @@ from .._schemas.user import RequestUserCreate, RequestUser
 from .._models import user
 from sqlalchemy.orm import Session
 from .._schemas.token import RequestToken, TokenData
-from fastapi import HTTPException, status, Depends
+from fastapi import HTTPException, status as httpStatus, Depends
 from datetime import datetime, timedelta, timezone
 from typing import Annotated, Union
 import jwt
@@ -15,7 +15,7 @@ from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]):
 
     credentials_exception = HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED,
+        status_code=httpStatus.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
         headers={"WWW-Authenticate": "Bearer"},
     )
@@ -49,7 +49,7 @@ def create_access_token(data: dict, expires_delta: Union[timedelta, None] = None
 
 def authenticate_user(db: Session, username: str, password: str):
     credentials_exception = HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED,
+        status_code=httpStatus.HTTP_401_UNAUTHORIZED,
         detail="Username or Password wrng",
         headers={"WWW-Authenticate": "Bearer"},
     )
@@ -65,7 +65,7 @@ def authenticate_user(db: Session, username: str, password: str):
    
 async def is_user_autenticate(token: Annotated[str, Depends(oauth2_scheme)]):
     credentials_exception = HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED,
+        status_code=httpStatus.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
         headers={"WWW-Authenticate": "Bearer"},
     )
@@ -81,7 +81,7 @@ async def is_user_autenticate(token: Annotated[str, Depends(oauth2_scheme)]):
 
 async def get_current_user(db: Session, token: Annotated[str, Depends(oauth2_scheme)]):
     credentials_exception = HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED,
+        status_code=httpStatus.HTTP_401_UNAUTHORIZED,
         detail="Incorrect username or password",
         headers={"WWW-Authenticate": "Bearer"},
     )
@@ -112,7 +112,7 @@ def login(form_data: OAuth2PasswordRequestForm, db: Session) -> RequestToken:
     user = authenticate_user(db, form_data.username, form_data.password)
     if not user:
         raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
+            status_code=httpStatus.HTTP_401_UNAUTHORIZED,
             detail="Incorrect username or password",
             headers={"WWW-Authenticate": "Bearer"},
         )
@@ -125,4 +125,7 @@ def login(form_data: OAuth2PasswordRequestForm, db: Session) -> RequestToken:
 
 def logout(current_user:User = Depends(oauth2_scheme), db: Session = Depends(get_db)):
     pass
+
+def status():
+    return {"logged": True}
     

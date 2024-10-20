@@ -8,7 +8,7 @@ from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
 
 router = APIRouter()
-templates = Jinja2Templates(directory="/home/rafa/Projects/Python/api-clima/frontend/dist/front/browser/")
+# templates = Jinja2Templates(directory="/home/rafa/Projects/Python/api-clima/frontend/dist/front/browser/")
 
 origins = [
 #     "http://localhost.tiangolo.com",
@@ -27,12 +27,12 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(lifespan=lifespan)    
-app.mount("/static", StaticFiles(directory="../frontend/dist/front/browser/"), name="static")
+# app.mount("/static", StaticFiles(directory="../frontend/dist/front/browser/"), name="static")
 
-@router.get("/")
-async def root(request: Request):
+# @router.get("/")
+# async def root(request: Request):
     
-    return templates.TemplateResponse("index.html", {"request": request})
+#     return templates.TemplateResponse("index.html", {"request": request})
 app.include_router(router)
 app.include_router(auth.router)
 app.include_router(test.router)
