@@ -13,9 +13,9 @@
               </button>
             </div>
             <p>O acceder con:</p>
-            <form>
-                <input type="email" placeholder="Correo electrónico">
-                <input type="password" placeholder="Contraseña">
+            <form  (ngSubmit)="login()" [formGroup]="formLogar">
+                <input type="email" placeholder="Correo electrónico" formControlName="username">
+                <input type="password" placeholder="Contraseña" formControlName="password">
                 <a href="#">Olvidaste tu contraseña?</a>
                 <button type="submit">ENTRAR</button>
             </form>
@@ -23,7 +23,7 @@
         <div class="login-right">
             <h2>Bienvenido!</h2>
             <p>Crea su cuenta y comienza a navegar</p>
-            <button>REGISTRARME</button>
+            <button (click)="btnInscrever()">REGISTRARME</button>
         </div>
     </div>
   </div>
