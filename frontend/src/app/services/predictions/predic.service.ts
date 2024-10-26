@@ -8,5 +8,5 @@ export class PredicService {
   private baseUrl = 'http://192.168.0.29:8000/'
 
   constructor(private http: HttpClient) { }
-  public getPredictData():Promise<>{}
+  public getPredictData():Promise<Array<any>>{}
 }
