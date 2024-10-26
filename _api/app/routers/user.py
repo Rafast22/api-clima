@@ -10,15 +10,15 @@ from sqlalchemy.orm import Session
 
 router = APIRouter()
 
-@router.put("/user")
+@router.put("/api/user")
 async def put_user(user: Annotated[RequestUser, Depends()], is_autenticate: Annotated[bool, Depends(is_user_autenticate)], db: Session = Depends(get_db)):
-    return update(db, is_autenticate, user)
+    return update(db, user)
     
-@router.get("/user/{user_id}")
+@router.get("/api/user/{user_id}")
 async def get_user(user_id: int, is_autenticate: Annotated[bool, Depends(is_user_autenticate)], db: Session = Depends(get_db)):
     return get_by_id(db, user_id)
 
-@router.delete("/user/{user_id}")
+@router.delete("/api/user/{user_id}")
 async def get_user(user_id: int, is_autenticate: Annotated[bool, Depends(is_user_autenticate)], db: Session = Depends(get_db)):
     delete_user(db, user_id)
     

@@ -7,6 +7,7 @@ from pydantic import BaseModel
 from typing import Annotated
 from fastapi import Depends, APIRouter, HTTPException, status
 from .._view import auth
+from .._view.auth import is_user_autenticate
 from .._schemas.user import RequestUserCreate
 from sqlalchemy.orm import Session
 from ..database import get_db
@@ -14,13 +15,17 @@ from ..database import get_db
 router = APIRouter()
 
 
-@router.post("/login")
+@router.post("/api/login")
 async def login(form_data: Annotated[OAuth2PasswordRequestForm, Depends()], db: Session = Depends(get_db)):
     return auth.login(form_data, db)
 
-@router.post("/register")
+@router.post("/api/register")
 async def register(form_data: Annotated[RequestUserCreate, Depends()], db: Session = Depends(get_db)):
     return auth.register(form_data, db)
+
+@router.get("/api/status")
+async def status( is_autenticate: Annotated[bool, Depends(is_user_autenticate)]):
+    return auth.status()
 
 # @router.post("/logout")
 # async def logout(

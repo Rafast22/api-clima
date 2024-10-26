@@ -11,15 +11,13 @@ from sqlalchemy.orm import Session
 from fastapi import HTTPException, status, Depends
 
 
-def update(db: Session, is_autenticate: bool , u: RequestUser) -> RequestUser:
+def update(db: Session , u: RequestUser) -> RequestUser:
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Email or Username is registred",
         headers={"WWW-Authenticate": "Bearer"},
     )    
-   
-    if is_autenticate is None:
-        raise 
+
     db_user = user.get_user_by_email(db, u.email)
     if db_user is not None:
         raise credentials_exception

@@ -7,7 +7,7 @@ import { DomSanitizer } from '@angular/platform-browser';
 import { Router } from '@angular/router';
 import { confirmPasswordValidator } from './validators/confirmar-contrasena.validator';
 import {MatInputModule} from '@angular/material/input';
-import { UserService } from '../../services/user.service';
+import { UserService } from '../../services/user/user.service';
 @Component({
   selector: 'app-register',
   standalone: true,
@@ -52,7 +52,7 @@ export class RegisterComponent {
   }
   async register() {
     if(this.formulario.valid){
-      this.userService.cadastrar(this.formulario).subscribe()
+      // this.userService.cadastrar(this.formulario).subscribe()
     }
   }
 }

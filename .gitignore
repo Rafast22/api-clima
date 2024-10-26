@@ -42,3 +42,4 @@ _api/app/_view/__pycache__
 _api/app/interceptor/__pycache__
 _api/app/interceptor/helpers/__pycache__
 _api/app/interceptor/interfaces/__pycache__
+_api/app/routers/__pycache__
