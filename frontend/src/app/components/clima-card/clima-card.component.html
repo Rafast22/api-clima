@@ -1,0 +1,25 @@
+<div class="body">
+    <button class="scroll-button left" onclick="scrollLeft()">
+        ◀
+    </button>
+    <div class="container" id="weatherContainer">
+        @for(day of weatherData; track day.name){
+
+            <div class="weather-card" >
+                    <div>
+                        {{ day.name }}
+                    </div>
+                    <img alt="Weather icon for {{ day.name }}" 
+                        height="50" 
+                        [src]="day.iconUrl" 
+                        width="50" />
+                        <div>
+                            {{ day.data.getDay() }}
+                        </div>
+                    </div>
+        }
+      </div>
+    <button class="scroll-button right" onclick="scrollRight()">
+        ▶
+    </button>
+</div>

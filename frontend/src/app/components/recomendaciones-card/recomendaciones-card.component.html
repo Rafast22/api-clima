@@ -1,0 +1,64 @@
+<body>
+  <div class="container">
+    <div class="header">
+      <mat-toolbar>
+        <span>Recomendaciones de días óptimos</span>
+      </mat-toolbar>
+    </div>
+    <div class="filters">
+      <section>
+        <mat-form-field>
+          <mat-label>Periodo</mat-label>
+          <mat-date-range-input [rangePicker]="picker">
+            <input matStartDate placeholder="Fecha de Inicio">
+            <input matEndDate placeholder="Fecha Final">
+          </mat-date-range-input>
+          <mat-hint>Dia/Mes/Ano – Dia/Mes/Ano</mat-hint>
+          <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+          <mat-date-range-picker [touchUi]="isMobile" #picker>
+            @if (isMobile) {
+            <mat-date-range-picker-actions>
+              <button mat-button matDateRangePickerCancel>Cancel</button>
+              <button mat-raised-button matDateRangePickerApply>Apply</button>
+            </mat-date-range-picker-actions>
+            }
+          </mat-date-range-picker>
+        </mat-form-field>
+        <mat-form-field>
+          <mat-label>Cultivo:</mat-label>
+          <mat-select>
+            @for (cultivo of cultivos; track cultivo) {
+            <mat-option [value]="cultivo.value">{{cultivo.description}}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+        <mat-form-field>
+          <mat-label>Tipo de actividad:</mat-label>
+          <mat-select>
+            @for (tipoAc of tipo; track tipoAc) {
+            <mat-option [value]="tipoAc.value">{{tipoAc.description}}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+      </section>
+      <section>
+        <button mat-flat-button color="primary" (click)="cargarClick()">Cargar</button>
+      </section>
+
+    </div>
+    <div class="content">
+      <div class="calendar">
+        <calendar-datapicker-range></calendar-datapicker-range>
+
+      </div>
+      <div class="chart-container">
+        <h3>Reporte de condiciones climáticas</h3>
+        <canvas id="chart"></canvas>
+      </div>
+    </div>
+    <div class="details" id="details">
+      <h3>Detalles del día</h3>
+      <p>Seleccione un día para ver los detalles.</p>
+    </div>
+  </div>
+</body>

@@ -1,5 +1,5 @@
 from fastapi import FastAPI, APIRouter
-from .routers import test, user, auth, cultivo, localidad
+from .routers import test, user, auth, cultivo, localidad, historico
 from fastapi.responses import RedirectResponse
 from .database import create_database,Base,engine
 from contextlib import asynccontextmanager
@@ -32,6 +32,7 @@ app.include_router(auth.router)
 app.include_router(test.router)
 app.include_router(user.router)
 app.include_router(cultivo.router)
+app.include_router(historico.router)
 app.include_router(localidad.router)
 
 app.add_middleware(

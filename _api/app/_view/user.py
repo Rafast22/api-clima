@@ -18,8 +18,6 @@ def update(db: Session, is_autenticate: bool , u: RequestUser) -> RequestUser:
         headers={"WWW-Authenticate": "Bearer"},
     )    
    
-   
-   
     if is_autenticate is None:
         raise 
     db_user = user.get_user_by_email(db, u.email)

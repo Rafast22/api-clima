@@ -83,3 +83,11 @@ def create_bulk(db: Session, datas: list[RequestDataCreate], localidad_id:int):
         db_data.localidad_id = localidad_id
         db.add(db_data)
     db.commit()
+
+def get_historico_by_usuario(db: Session, user_id:int):
+    # db_history = db.query(History_Data).filter(History_Data.user_id == user_id)
+    db_history = db.query(History_Data).limit(250).all()
+
+    if not db_history:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="History_Data not found")
+    return db_history
