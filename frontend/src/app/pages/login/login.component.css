@@ -62,13 +62,7 @@ background-position: center;  */
   display: flex;
   flex-direction: column;
 }
-.login-left input[type="email"],
-.login-left input[type="password"] {
-  padding: 10px;
-  margin-bottom: 10px;
-  border: 1px solid #ddd;
-  border-radius: 5px;
-}
+
 .login-left a {
   color: #007bff;
   text-decoration: none;
@@ -118,4 +112,18 @@ background-position: center;  */
   .login-box {
       flex-direction: row;
   }
+}
+.clickable-icon {
+  cursor: pointer; /* Cursor de ponteiro ao passar o mouse */
+  transition: transform 0.2s ease; /* Transição suave para o efeito de clique */
+}
+
+.clickable-icon:hover {
+  transform: scale(1.1); /* Aumenta o tamanho ao passar o mouse */
+  /* Outras propriedades visuais, como cor ou sombra */
+}
+
+.clickable-icon:active {
+  transform: scale(0.95); /* Diminui o tamanho ao clicar */
+  /* Outras propriedades visuais */
 }

@@ -31,14 +31,14 @@
         <mat-list-item>
             <button routerLink="" mat-button style="color:#F8F8F2"><mat-icon>cloud</mat-icon> Clima</button>
         </mat-list-item>
-        <mat-list-item>
+        <!-- <mat-list-item>
             <button mat-button [matMenuTriggerFor]="cultivo" style="color: #F8F8F2;"><mat-icon>add</mat-icon> Registrar Cultivo</button>
             <mat-menu #cultivo="matMenu">
                 <button mat-menu-item>Cosecha</button>
                 <button mat-menu-item>Cultivo</button>
                 <button mat-menu-item>Siembra</button>
             </mat-menu>
-        </mat-list-item>
+        </mat-list-item> -->
         <mat-list-item>
             <button mat-button style="color: #F8F8F2;"><mat-icon>settings</mat-icon> Configuracion</button>
         </mat-list-item>
@@ -50,8 +50,8 @@
     </mat-drawer>
     <mat-drawer-content>
         <div style="text-align: center;min-height: 600px;">
-            
-            <router-outlet></router-outlet>
-            </div>
+            <div #container></div>
+
+        </div>
     </mat-drawer-content>
 </mat-drawer-container>

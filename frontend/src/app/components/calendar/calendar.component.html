@@ -1,0 +1,27 @@
+<div class="calendar">
+        <div class="header">
+            <div class="button-header" (click)="changeMonth(-1)">
+                <mat-icon >chevron_left</mat-icon>
+                <span >Anterior</span>
+            </div>
+
+       
+        <span>{{ monthYear }}</span>
+        <div class="button-header" (click)="changeMonth(1)">
+            <span >Siguiente</span>
+            <mat-icon >chevron_right</mat-icon>
+        </div>
+    </div>
+    <div class="days">
+        <div class="day">Dom</div>
+        <div class="day">Lun</div>
+        <div class="day">Mar</div>
+        <div class="day">Mié</div>
+        <div class="day">Jue</div>
+        <div class="day">Vie</div>
+        <div class="day">Sáb</div>
+    </div>
+    <div class="dates">
+        <div *ngFor="let date of calendarDates" class="date" [style]="date.Style" (click)="selectDay(date.UTCDate)">{{ date.date }}</div>
+    </div>
+</div>

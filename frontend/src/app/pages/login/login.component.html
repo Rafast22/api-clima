@@ -4,20 +4,41 @@
         <div class="login-left">
             <h2>Acceder a mi cuenta</h2>
             <div class="social-login">
-              <button (click)="registerWithFacebook()"  mat-icon-button>
-                <mat-icon class="fa-brands fa-facebook-f">facebook</mat-icon>
-              </button>
-              <button (click)="registerWithFacebook()"  mat-icon-button>
-                <mat-icon svgIcon="google"></mat-icon>
-
-              </button>
+                <mat-icon (click)="registerWithFacebook()" style="width: 30px; height: 30px; margin-right: 15px;" svgIcon="facebook" class="clickable-icon">facebook</mat-icon>
+                <mat-icon (click)="registerWithFacebook()" style="width: 30px; height: 30px;" svgIcon="google" class="clickable-icon"></mat-icon>
+             
+              
             </div>
             <p>O acceder con:</p>
             <form  (ngSubmit)="login()" [formGroup]="formLogar">
-                <input type="email" placeholder="Correo electrónico" formControlName="username">
-                <input type="password" placeholder="Contraseña" formControlName="password">
+                <mat-form-field>
+                  <mat-label>Correo electrónico</mat-label>
+                  <input
+                    matInput
+                    placeholder="pat@example.com"
+                    [formControl]="email"
+                    (blur)="updateErrorMessage()"
+                    required
+                  />
+                  @if (email.invalid) {
+                    <mat-error>{{errorMessageEmail()}}</mat-error>
+                  }
+                </mat-form-field>
+                <mat-form-field>
+                  <mat-label>Contraseña</mat-label>
+                  <input
+                    matInput
+                    type="password" 
+                    [formControl]="password"
+                    (blur)="updateErrorMessagePassword()"
+                    required
+                  />
+                  @if (password.invalid) {
+                    <mat-error>{{errorMessagepassword()}}</mat-error>
+                  }
+                </mat-form-field>
                 <a href="#">Olvidaste tu contraseña?</a>
-                <button type="submit">ENTRAR</button>
+                <button type="submit" [disabled]="formLogar.invalid">ENTRAR</button>
             </form>
         </div>
         <div class="login-right">

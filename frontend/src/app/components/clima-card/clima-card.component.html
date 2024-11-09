@@ -1,25 +1,30 @@
 <div class="body">
-    <button class="scroll-button left" onclick="scrollLeft()">
-        ◀
-    </button>
-    <div class="container" id="weatherContainer">
+    <mat-icon (click)="moverCards(-1)">chevron_left</mat-icon>
+
+    <div class="container" #calendarContainer id="weatherContainer">
         @for(day of weatherData; track day.name){
 
-            <div class="weather-card" >
-                    <div>
-                        {{ day.name }}
-                    </div>
-                    <img alt="Weather icon for {{ day.name }}" 
-                        height="50" 
-                        [src]="day.iconUrl" 
-                        width="50" />
-                        <div>
-                            {{ day.data.getDay() }}
-                        </div>
-                    </div>
+        <div class="weather-card"
+            [style]="day.today?{'background-color': 'rgba(0, 71, 102, 0.2)', 'border': '1px solid #2e3d49'}:{}">
+            <div>
+                {{ day.name }}
+                <div style="font-size: small; color: grey;">
+                    {{ day.data.getDate() +' ' + day.month }}
+                </div>
+            </div>
+            <div style="font-size: 48px;">
+                <img [src]="day.iconUrl" width="48" height="48" alt="Nubes y claros">
+            </div>
+            <div class="div" style="margin-bottom: 16px; position: relative;">
+                <span style="color: #2A65CB;">{{day.precip}}</span>
+                </div>
+            <div class="row">
+                <span style="color: #2A65CB;">{{day.min}}</span>
+                <span style="color: #CB2C2A;">{{day.max}}</span>
+            </div>
+            
+        </div>
         }
-      </div>
-    <button class="scroll-button right" onclick="scrollRight()">
-        ▶
-    </button>
+    </div>
+    <mat-icon (click)="moverCards(1)">chevron_right</mat-icon>
 </div>

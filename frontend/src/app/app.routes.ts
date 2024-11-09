@@ -8,7 +8,7 @@ import { TesteComponent } from './pages/teste/teste.component';
 export const routes: Routes = [
     { path: "login", component: LoginComponent, pathMatch: "full" },
     { path: "register", component: RegisterComponent, pathMatch: "full" },
-    { path: "principal", component: PrincipalComponent, pathMatch: "full", canActivate: [authGuard] },
+    { path: "principal", component: PrincipalComponent, pathMatch: "full", /*canActivate: [authGuard] */},
     { path: "testeAngular", component: TesteComponent, pathMatch: "full" },
   ];
   

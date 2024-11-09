@@ -4,19 +4,63 @@
         <div class="register-left">
             <h2>Crear una cuenta</h2>
             <div class="social-register">
-              <mat-icon class="fa-brands fa-facebook-f">facebook</mat-icon>
-              <mat-icon svgIcon="google"></mat-icon>
+              <mat-icon  style="width: 30px; height: 30px; margin-right: 15px;" svgIcon="facebook" class="clickable-icon">facebook</mat-icon>
+                <mat-icon  style="width: 30px; height: 30px;" svgIcon="google" class="clickable-icon"></mat-icon>
             </div>
             <p>O registrarse con:</p>
             <form  class="form" (ngSubmit)="register()" [formGroup]="formulario">
-                <input matInput id="nome" type="text" placeholder="Nombre completo" formControlName="nome">
-                
-                <input matInput type="email" id="email" placeholder="Correo electrónico" formControlName="email">
-                <!-- @if (email.invalid) {
-                  <mat-error>{{errorMessage()}}</mat-error>
-                } -->
-                <input matInput type="password" placeholder="Contraseña" id="contrasena" formControlName="contrasena">
-                <input matInput type="password" placeholder="Confirmar contraseña" id="contrasena" formControlName="confirmContrasena">
+                <mat-form-field>
+                  <mat-label>Nombre completo</mat-label>
+                  <input
+                    matInput
+                    placeholder="Nombre completo"
+                    [formControl]="full_name"
+                    (blur)="updateErrorMessage('full_name')"
+                    required
+                  />
+                  @if (email.invalid) {
+                    <mat-error>{{errorMessageName()}}</mat-error>
+                  }
+                </mat-form-field>
+                <mat-form-field>
+                  <mat-label>Correo electrónico</mat-label>
+                  <input
+                    matInput
+                    placeholder="pat@example.com"
+                    [formControl]="email"
+                    (blur)="updateErrorMessage('email')"
+                    required
+                  />
+                  @if (email.invalid) {
+                    <mat-error>{{errorMessageEmail()}}</mat-error>
+                  }
+                </mat-form-field>
+                <mat-form-field>
+                  <mat-label>Contraseña</mat-label>
+                  <input
+                    matInput
+                    type="password" 
+                    [formControl]="password"
+                    (blur)="updateErrorMessage('password')"
+                    required
+                  />
+                  @if (password.invalid) {
+                    <mat-error>{{errorMessagePassword()}}</mat-error>
+                  }
+                </mat-form-field>  
+                <!-- <mat-form-field>
+                  <mat-label>Confirmar contraseña</mat-label>
+                  <input
+                    matInput
+                    type="password" 
+                    [formControl]="confirmPassword"
+                    (blur)="updateErrorMessage('confirmPassword')"
+                    required
+                  />
+                  @if (password.invalid) {
+                    <mat-error>{{errorMessageConfirmPassword()}}</mat-error>
+                  }
+                </mat-form-field>   -->
                 <button type="submit">REGISTRARME</button>
             </form>
         </div>
