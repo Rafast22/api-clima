@@ -56,9 +56,10 @@ def authenticate_user(db: Session, username: str, password: str):
     user_db = user.get_user_by_email_or_username(db,username)
     try:
         if not user_db:
-            return False
+            return {'reponse':False, 'error':'User not Found'}
         if not user_db.verify_password(password):
-            return False
+            return {'reponse':False, 'error':'Incorrect Password'}
+            
         return user_db
     except UnknownHashError:
       raise credentials_exception

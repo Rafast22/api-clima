@@ -13,8 +13,6 @@ from sqlalchemy.orm import relationship
 class User(Base):
     __tablename__ = "User"
     def __init__(self, user:RequestUser, user_id:int=None):
-        # if user_id:
-        #     self.id = user_id
         self.username = user.username 
         if user.password:
             self.password = pwd_context.hash(user.password)
@@ -22,8 +20,6 @@ class User(Base):
         self.email = user.email  
         self.is_staff = user.is_staff  
         self.is_active = user.is_active  
-        # self.last_login = user.last_login  
-        # self.date_joined = user.date_joined  
         self.role = user.role  
          
     id = Column(Integer, primary_key=True, index=True)

@@ -1,4 +1,4 @@
-import { Component, ElementRef, OnInit, Renderer2, ViewChild } from '@angular/core';
+import { Component, ElementRef, Input, OnInit, Renderer2, ViewChild } from '@angular/core';
 import { MatIconModule, MatIconRegistry } from '@angular/material/icon';
 import { DomSanitizer } from '@angular/platform-browser';
 
@@ -19,8 +19,11 @@ export class ClimaCardComponent implements OnInit{
     for (let index = 1; index < 21; index++) {
       this.matIconRegistry.addSvgIcon(`wind-${index}`, this.domSanitizer.bypassSecurityTrustResourceUrl(`../../../assets/icons/viento/${index}.svg`));
     }
+    this.predicciones = [];
   }
-
+  @Input()
+  public predicciones:any[];
+  
   moverCards(direcao: number) {
     if(!this.calendarContainer) return;
     const container = this.calendarContainer.nativeElement;
@@ -50,9 +53,9 @@ export class ClimaCardComponent implements OnInit{
       day.month = day.data.toLocaleString('default', { month: 'short'})
       day.iconUrl = 'https://www.tiempo.com/css/v3/svgs/symbols/color/1.svg'
       this.weatherData.push(day)
-      day.min = '16°';
-      day.max  ='30°'
-      day.precip = '10%'
+      day.min = '°';
+      day.max  ='°'
+      day.precip = '%'
     }
   }
 

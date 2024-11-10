@@ -8,6 +8,11 @@ from .._view.auth import is_user_autenticate
 from sqlalchemy.orm import Session
 router = APIRouter()
 
-@router.get("/historico/{user_id}")
-async def get_historico_by_usuario(user_id: int, is_autenticate: Annotated[bool, Depends(is_user_autenticate)], db: Session = Depends(get_db)):
-    return historico.get_historico_by_usuario(db, user_id)
+@router.get("/api/historico")
+async def get_historico_by_usuario(tipo:int, cultivo:int, is_autenticate: Annotated[bool, Depends(is_user_autenticate)], db: Session = Depends(get_db)):
+    return historico.get_historico_by_usuario(db, tipo, cultivo)
+
+@router.post("/api/historico")
+async def get_historico_by_usuario_day(tipo:int, cultivo:int, dia:str, is_autenticate: Annotated[bool, Depends(is_user_autenticate)], db: Session = Depends(get_db), ):
+    return historico.get_historico_by_usuario_day(db, dia, cultivo, tipo)
+
