@@ -5,7 +5,7 @@
         <span>Recomendaciones de días óptimos</span>
       </mat-toolbar>
     </div>
-    <app-clima-card ></app-clima-card>
+    <app-clima-card></app-clima-card>
 
     <div class="filters">
       <section>
@@ -50,7 +50,7 @@
     </div>
     <div class="content">
       <div class="calendar">
-        <app-calendar [ListPerfectDays]="perfect" [perfectDays]="perfectDays" (selectedDay)="_onChangeDate($event)"></app-calendar>
+        <app-calendar  #calendarComponent [ListPerfectDays]="perfect" [perfectDays]="perfectDays" (selectedDay)="_onChangeDate($event)"></app-calendar>
 
       </div>
       <div class="chart-container">

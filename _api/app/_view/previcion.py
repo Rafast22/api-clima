@@ -1,4 +1,5 @@
 import datetime
+import pandas as pd
 from collections import defaultdict
 from typing import  Annotated, List
 from jwt.exceptions import InvalidTokenError
@@ -60,6 +61,48 @@ def get_previcion_by_day(db: Session, day:str, tipo, cultivo) -> List[Prediction
        result["dia_optimo"].append(get_valores_por_tipo_parametro_cosecha(result["prectotcorr"][k], result["ws2m"][k], result["rh2m"][k], result["t2m"][k], result["qv2m"][k], tipo, cultivo))
 
     return result
+
+def get_previcion_semana(db: Session, day:datetime.datetime) -> List[Predictions]:
+    """
+    Obtiene la previcion de la semana actual para el componente de card
+    Args:
+        db (Session): Session del sqlAlchemy.
+        day (DateTime):fecha del dia actual para evitar problemas de timezone, obtiene del usuario.
+
+    Returns:
+        list: Lista de previsões.
+    """
+    str_day= day.strftime('%Y%m%d')+"00"
+    db_predictions = predictions.get_previcion_semana(db,  str_day)
+    if not db_predictions:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
+    
+
+    result = defaultdict(list)  
+
+    for obj in db_predictions:
+        for attribute_name, attribute_value in obj.__dict__.items():
+            if not callable(attribute_value) and not attribute_name.startswith('_'):
+                if attribute_name == "date":
+                    formato = "%Y%m%d%H"
+                    data = datetime.datetime.strptime(attribute_value, formato)
+                    result[attribute_name].append(data)
+                else:
+                    result[attribute_name].append(attribute_value)
+    # result["dia_optimo"] = list
+    # for k in range(0, len(result["id"])-1):
+    #    result["dia_optimo"].append(get_valores_por_tipo_parametro_cosecha(result["prectotcorr"][k], result["ws2m"][k], result["rh2m"][k], result["t2m"][k], result["qv2m"][k], tipo, cultivo))
+    df = pd.DataFrame.from_dict(result)
+    df = df.drop('localidad_id', axis=1)
+    df = df.drop('id', axis=1)
+    columns = lambda lista: list(filter(lambda x: x != "date", lista))
+
+    mean = df[columns(df.columns.to_list())]
+    mean = df.groupby(df['date'].dt.date)[columns(df.columns.to_list())].mean()
+    
+    mean = mean.map(lambda x: '{:.2f}'.format(x))
+    return mean.to_dict()
+
 
 def get_valores_por_tipo_parametro_cosecha(prectotcorr, ws2m, rh2m, t2m, qv2m, tipo, cultivo)->bool:
     

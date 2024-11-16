@@ -1,13 +1,16 @@
-import { AfterViewInit, Component, Input, ViewChild, ViewContainerRef } from '@angular/core';
+import { AfterViewInit, Component, Input, OnInit, ViewChild, ViewContainerRef } from '@angular/core';
 import { MatToolbarModule } from "@angular/material/toolbar"
 import { MatIconModule } from "@angular/material/icon"
 import { MatMenuModule } from "@angular/material/menu"
-import { MatSidenavModule } from "@angular/material/sidenav"
+import { MatDrawer, MatSidenavModule } from "@angular/material/sidenav"
 import { MatListModule } from "@angular/material/list"
-import { RouterOutlet } from '@angular/router';
+import { Router, RouterOutlet } from '@angular/router';
 import { MatBadgeModule } from '@angular/material/badge';
 import { MatButtonModule } from "@angular/material/button"
 import { RecomendacionesCardComponent } from '../recomendaciones-card/recomendaciones-card.component';
+import { BreakpointObserver } from '@angular/cdk/layout';
+import { MatTabsModule } from '@angular/material/tabs';
+import { PrincipalComponent } from '../../pages/principal/principal.component';
 
 
 
@@ -16,28 +19,25 @@ import { RecomendacionesCardComponent } from '../recomendaciones-card/recomendac
   templateUrl: './navebar.component.html',
   styleUrls: ['./navebar.component.css'],
   standalone: true,
-  imports: [MatToolbarModule, MatIconModule,
-    MatMenuModule,
-    MatSidenavModule, MatListModule, RouterOutlet, MatBadgeModule, MatButtonModule, RecomendacionesCardComponent]
+  imports: [MatToolbarModule, MatIconModule, MatMenuModule, MatSidenavModule, 
+    MatListModule, RouterOutlet, MatBadgeModule, MatButtonModule, MatTabsModule, PrincipalComponent]
 })
-export class NaveBarComponent implements AfterViewInit {
+export class NaveBarComponent implements AfterViewInit, OnInit {
   @ViewChild('container', { read: ViewContainerRef }) container!: ViewContainerRef;
+  @ViewChild('drawer') drawer: MatDrawer | any = undefined;
+
   @Input() component: any;
-
-  constructor() { }
-  // ngOnChanges() {
-  //   // if (changes['component'] && !changes['component'].isFirstChange()) { 
-  //   //   this.loadComponent(this.component);
-  //   // }
-
-  //   if (this.component) {
-  //     this.loadComponent(this.component);
-  //   }
-  // }
-
+  get isMobile(): boolean {
+    return this.breakpointObserver.isMatched('(max-width: 767px)');
+  }
+  constructor(private breakpointObserver: BreakpointObserver, private router:Router) { }
+  
+  ngOnInit(): void {
+    this.router.navigate(['/recomendaciones']);
+  }
   ngAfterViewInit() {
     if (this.component) {
-      this.loadComponent(this.component);
+      // this.loadComponent(this.component);
     }
   }
 

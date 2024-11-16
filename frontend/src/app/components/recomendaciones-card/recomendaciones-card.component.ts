@@ -1,4 +1,4 @@
-import { AfterViewInit, ChangeDetectionStrategy, Component, model } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, Component, ElementRef, model, ViewChild } from '@angular/core';
 import { MatCardModule } from '@angular/material/card';
 import { MAT_DATE_LOCALE, provideNativeDateAdapter } from '@angular/material/core';
 import { MatDatepickerModule } from '@angular/material/datepicker';
@@ -27,8 +27,10 @@ import { ClimaCardComponent } from '../clima-card/clima-card.component';
 
 })
 export class RecomendacionesCardComponent implements AfterViewInit {
+  @ViewChild('calendarComponent') calendarComponent: CalendarComponent | undefined = undefined;
+
   chart: any = [];
-  perfectDays:any[] 
+  perfectDays:any[] = []
   private chartDatasource: any = {};
   get isMobile(): boolean {
     return this.breakpointObserver.isMatched('(max-width: 767px)');
@@ -125,5 +127,7 @@ export class RecomendacionesCardComponent implements AfterViewInit {
     const d = new Date()
     const e = new Date(d.getFullYear(), d.getMonth(), d.getDate()+3)
     this.perfectDays.push(e)
+    if(this.calendarComponent)
+    this.calendarComponent.updateCalendar()
   }
 }

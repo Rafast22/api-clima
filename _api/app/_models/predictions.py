@@ -1,11 +1,11 @@
 from sqlalchemy import Column, Integer, String, Boolean, DateTime, or_, ForeignKey, DECIMAL
-from sqlalchemy.sql import func
+from sqlalchemy.sql import func, between
 from sqlalchemy.orm import relationship, Session
 from sqlalchemy.ext.declarative import declarative_base
 from ..database import Base
 from .._schemas.nasa_data import RequestDataCreate, RequestData
 from fastapi import HTTPException, status
-from datetime import datetime
+from datetime import datetime, timedelta
 class Predictions(Base):
     __tablename__ = "Predictions"
     def __init__(self, history: RequestDataCreate):
@@ -94,6 +94,30 @@ def get_previcion_by_day(db: Session, day:str):
     db_data = db.query(Predictions).filter(
         func.lower(Predictions.date).startswith(day)  # Filtra pelo nome começando com "maria"
     ).all()
+
+    if not db_data:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Predictions not found")
+    return db_data
+
+def get_previcion_semana(db: Session, day:str):
+    dt_inicio = datetime.strptime(day, '%Y%m%d%H')
+    # dt_final = datetime.strptime(data_inicio, '%Y%m%d%H')
+    dt_final = dt_inicio + timedelta(days=6, hours=23)
+
+    db_data = db.query(Predictions).filter(
+        between(
+            func.cast(
+                func.substring(Predictions.date, 1, 4) + '-' +
+                func.substring(Predictions.date, 5, 2) + '-' +
+                func.substring(Predictions.date, 7, 2) + ' ' +
+                func.substring(Predictions.date, 9, 2) + ':00:00',
+                DateTime
+            ),
+            dt_inicio,
+            dt_final
+        )
+    ).all()
+
 
     if not db_data:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Predictions not found")

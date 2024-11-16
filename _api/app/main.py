@@ -1,7 +1,7 @@
 from fastapi import FastAPI, APIRouter, BackgroundTasks
 from .routers import test, user, auth, cultivo, localidad, historico,previcion
 from fastapi.responses import RedirectResponse
-from .database import create_database,Base,engine
+from .database import get_db,Base,engine
 from contextlib import asynccontextmanager
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.templating import Jinja2Templates
@@ -28,12 +28,12 @@ async def lifespan(app: FastAPI):
     Base.metadata.create_all(bind=engine)
     yield
     
-def fetch_request():
+def fetch_request(db):
     # with aiohttp.ClientSession() as session:
     #     with session.get("http://127.0.0.1:8000/api/start-previcion") as response:
 
-    print(requests.get("http://127.0.0.1:8000/api/start-previcion"))
-    
+    # print(requests.get("http://127.0.0.1:8000/api/start-previcion"))
+    predict(next(db))    
 
     
 
@@ -41,7 +41,7 @@ def fetch_request():
 app = FastAPI(lifespan=lifespan)    
 # app.mount("/static", StaticFiles(directory="../frontend/dist/front/browser/"), name="static")
 scheduler = BackgroundScheduler()
-scheduler.add_job(fetch_request, 'cron', hour=9, minute=46)  # Executa às 00:00 todos os dias
+scheduler.add_job(fetch_request, 'cron', hour=15, minute=7, args=(get_db(),))  # Executa às 00:00 todos os dias
 scheduler.start()
 
 # @router.get("/")

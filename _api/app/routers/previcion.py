@@ -6,7 +6,7 @@ from .._view import previcion
 from ..database import get_db
 from .._view.auth import is_user_autenticate
 from sqlalchemy.orm import Session
-from datetime import date
+from datetime import date, datetime
 router = APIRouter()
 
 @router.get("/api/previciones/{fecha_inicio}:{fecha_final}")
@@ -16,6 +16,10 @@ async def get_previcion(fecha_inicio:date, fecha_final:date,tipo:int, cultivo:in
 @router.post("/api/previcion")
 async def get_previcion_by_day(tipo:int, cultivo:int, dia:str, is_autenticate: Annotated[bool, Depends(is_user_autenticate)], db: Session = Depends(get_db), ):
     return previcion.get_previcion_by_day(db, dia, tipo, cultivo)
+
+@router.post("/api/previcion/semana")
+async def get_previcion_semana(fecha_inicio: datetime, db: Session = Depends(get_db), ):
+    return previcion.get_previcion_semana(db, fecha_inicio)
 
 @router.get("/api/start-previcion")
 async def get_previcion_by_day(db: Session = Depends(get_db), ):

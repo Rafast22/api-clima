@@ -30,12 +30,31 @@
     text-align: center;
     padding: 10px;
     cursor: pointer;
-}
+    background-color: white;
+    transform: scale(0.95);
 
+}
 .date:hover {
     background-color: #e0e0e0;
 }
 
+.perfect-date {
+    text-align: center;
+    padding: 10px;
+    cursor: pointer;
+    background-color: #b9e09e;
+    transform: scale(0.95);
+
+}
+.perfect-date:hover {
+    background-color: #cde9b9
+}
+.perfect-date:active{
+    transform: scale(0.75);
+}
+.today{
+    border: 1px solid #ccc
+}
 .weekend {
     color: red; 
   }
@@ -46,6 +65,7 @@
     margin-right: 10px;
     cursor: pointer; 
     transition: transform 0.2s ease;
+    padding: 5px
 }
 
   
@@ -54,6 +74,8 @@
     margin-left: 10px;
     margin-right: 10px;
     transform: scale(1.1); 
+    padding: 5px
+    
   }
   
   .button-header:active {
@@ -61,4 +83,11 @@
     margin-left: 10px;
     margin-right: 10px;
     transform: scale(0.95); 
+    padding: 5px;
+    background-color: aqua;
+    border-radius: 5px;
+
+    
   }
+
+  
