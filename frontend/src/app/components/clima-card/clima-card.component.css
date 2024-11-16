@@ -1,0 +1,64 @@
+.body{
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0;
+    max-width: 80vw;
+    font-family: Arial, sans-serif;
+}
+.container {
+    display: flex;
+    overflow-x: scroll;
+    position: relative;
+        
+}
+.container::-webkit-scrollbar {
+    height: 10px; /* Altura da barra de rolagem */
+}
+
+.container::-webkit-scrollbar-track {
+    background: #f1f1f1; /* Cor da trilha da barra de rolagem */
+}
+
+.container::-webkit-scrollbar-thumb {
+    background: #888; /* Cor do "thumb" da barra de rolagem */
+    border-radius: 5px; /* Borda arredondada */
+}
+
+.container::-webkit-scrollbar-thumb:hover {
+    background: #555; /* Cor do "thumb" ao passar o mouse */
+}
+.weather-card {
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 0.688rem;
+    margin: 0.688rem;
+    text-align: center;
+    justify-content: center;
+    width: 100px;
+    flex-shrink: 0;
+    flex-direction: column;
+    justify-content: center;
+
+}
+.weather-card {
+    width: 108px;
+    height: 248px;
+}
+.scroll-button {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background-color: rgba(0, 0, 0, 0.5);
+    color: white;
+    border: none;
+    cursor: pointer;
+    z-index: 1;
+}
+.scroll-button.left {
+    left: 0;
+}
+.scroll-button.right {
+    right: 0;
+}

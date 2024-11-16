@@ -16,12 +16,11 @@ class Localidad(Base):
         self.cultivo_id = localidad.cultivo_id
     
     id = Column(Integer, primary_key=True, index=True)
-    latitude = Column(String, index=True) #models.DecimalField(max_digits=100, decimal_places=15, null=True)
-    longitude = Column(String, index=True) #models.DecimalField(max_digits=100, decimal_places=2, null=True)
+    latitude = Column(String, index=True) 
+    longitude = Column(String, index=True)
     user_id = Column(Integer, ForeignKey('User.id'))
     cultivo_id = Column(Integer, ForeignKey('Cultivos.id'), nullable=True)
-    # user = relationship("User", back_populates="localidad") 
-    # cultivo = relationship("Cultivos", back_populates="localidad") 
+   
     
 
 def get_by_id(db: Session, localidad_id: int):

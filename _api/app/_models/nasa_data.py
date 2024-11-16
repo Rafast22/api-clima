@@ -5,10 +5,10 @@ from sqlalchemy.ext.declarative import declarative_base
 from ..database import Base
 from .._schemas.nasa_data import RequestDataCreate, RequestData
 from fastapi import HTTPException, status
+from sqlalchemy import func
 
 class History_Data(Base):
     __tablename__ = "History_Data"
-
     def __init__(self, history: RequestDataCreate):
         self.date = history.date
         self.prectotcorr = history.prectotcorr
@@ -16,9 +16,6 @@ class History_Data(Base):
         self.qv2m = history.qv2m
         self.t2m = history.t2m
         self.ws2m = history.ws2m
-
-    # user = relationship("User", back_populates="Data") 
-    # cultivo = relationship("Cultivos", back_populates="Data") 
     
     id = Column(Integer, primary_key=True, index=True)
     date = Column(String, nullable=True)
@@ -83,3 +80,19 @@ def create_bulk(db: Session, datas: list[RequestDataCreate], localidad_id:int):
         db_data.localidad_id = localidad_id
         db.add(db_data)
     db.commit()
+def get_historico(db: Session):
+    # db_history = db.query(History_Data).filter(History_Data.user_id == user_id)
+    db_history = db.query(History_Data).all()
+    if not db_history:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="History_Data not found")
+    return db_history
+
+def get_historico_by_usuario_day(db: Session, day:str):
+    # db_history = db.query(History_Data).filter(History_Data.user_id == user_id)
+    db_history = db.query(History_Data).filter(
+        func.lower(History_Data.date).startswith(day)  # Filtra pelo nome começando com "maria"
+    ).all()
+    
+    if not db_history:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="History_Data not found")
+    return db_history

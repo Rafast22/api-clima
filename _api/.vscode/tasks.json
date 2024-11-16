@@ -16,7 +16,7 @@
         {
             "label": "Run server",
             "type": "shell",
-            "command": "source ${workspaceFolder}/.env/bin/activate; uvicorn --workers 3 --host 0.0.0.0 app.main:app --reload",
+            "command": "source ${workspaceFolder}/.env/bin/activate; uvicorn --workers 3 app.main:app --reload",
             "problemMatcher": [],
             "group": {
                 "kind": "build"

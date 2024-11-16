@@ -21,6 +21,7 @@ async def get_history_date(latitude: str, longitude: str):
         "PRECTOTCORR",
     #    
         "WS2M"
+    #add radiacion solar
 ]
     json_string = await get_formated_dict('20100101', '20240101',latitude, longitude, PARAMETERS)    
     # json_raw = json.loads(json_string)

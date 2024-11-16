@@ -9,13 +9,6 @@ from fastapi import HTTPException, status
 
 class Cultivo(Base):
     __tablename__ = "Cultivos"
-    
-    # class Cycle(models.IntegerChoices):
-    #     EARLY = 1
-    #     SEMI_PRECOCIUS = 2
-    #     MEDIUM = 3
-    #     LATE = 4
-
     id = Column(Integer, primary_key=True, index=True)
     create_date  = Column(DateTime, index=True, server_default=func.now(), nullable=False)
     update_date = Column(DateTime, index=True, onupdate=func.now(), nullable=False)
@@ -23,8 +16,6 @@ class Cultivo(Base):
     variety = Column(String, index=True, nullable=False)
     cycle_duration = Column(Integer, index=True, nullable=False)
     user_id = Column(Integer, ForeignKey('User.id'), nullable=False)
-    # user = relationship("User", back_populates="cultivos") 
-    # localidad = relationship("Localidad", back_populates="cultivo")
 
 def get_cultivo_by_id(db: Session, cultivo_id: int):
     return db.get(Cultivo, cultivo_id)
