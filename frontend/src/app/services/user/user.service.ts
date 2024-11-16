@@ -11,7 +11,7 @@ export class UserService {
   
   tokenKey:string = 'token';
   private headers:HttpHeaders
-  private baseUrl = 'http://192.168.0.29:8000/api/'
+  private baseUrl = 'http://127.0.0.1:8000/api'
   isLoggedInSubject = new BehaviorSubject<boolean>(false);
 
   constructor(private http: HttpClient) {
@@ -54,20 +54,39 @@ export class UserService {
   }
 
   public async cadastrar(usuario: User) {
-    return await this.http.post<any>(`${this.baseUrl}/register`, usuario, { headers:this.headers }).toPromise().then(r => {
-      console.log(r);
+    this.headers =  new HttpHeaders({
+      'accept': "application/json",
+      'Content-Type': 'application/json'  
     })
+    return await this.http.post<any>(`${this.baseUrl}/register`, usuario, { headers:this.headers }).toPromise().then(r => {
+      const a = {Ok: true}
+      return a
+    })
+    .catch(err => {
+      const r:any = {};
+      r.Ok = false;
+      r.error = this.tratarRespostaDeCdasto(err.error.detail);
+      return r;
+    })
+  }
+
+  tratarRespostaDeCdasto(err:string){
+    if(err.toLowerCase().includes("username") ){
+      return "El email ya esta registrado"
+    }
+    else if(err.toLowerCase().includes("email")){}
+    return ''
   }
 
   public async login(usuario: User):Promise<boolean> {
     let ret:boolean=false
     const body = new HttpParams()
       .set('grant_type', 'password')
-      .set('username', usuario.username ?? "")
+      .set('username', usuario.email ?? "")
       .set('password', usuario.password ?? "") 
       .set('client_id', 'string') 
       .set('client_secret', 'string'); 
-      await this.http.post<Token>(`${this.baseUrl}login`, body.toString(), { headers:this.headers }).toPromise().then(r =>{
+      await this.http.post<Token>(`${this.baseUrl}/login`, body.toString(), { headers:this.headers }).toPromise().then(r =>{
         if(r){
           this.setToken(r.access_token)
           ret = true;
@@ -94,7 +113,7 @@ export class UserService {
     .set('Content-Type', 'application/json')
     .set('accept', 'application/json');
     return new Promise<boolean>((resolve) => {
-      this.http.get<any>(`${this.baseUrl}status`, { headers: this.headers }).subscribe(
+      this.http.get<any>(`${this.baseUrl}/status`, { headers: this.headers }).subscribe(
         (r) => {
           if (r['logged'] === true) {
             resolve(true);

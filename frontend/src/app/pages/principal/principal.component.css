@@ -1,0 +1,12 @@
+.container {
+    display: flex;
+    flex-direction: row;
+  }
+  
+  app-navebar {
+    flex: 0 0 250px; /* Largura fixa do sidebar */
+  }
+  
+  .content {
+    flex: 1; /* O conteúdo ocupa o espaço restante */
+  }

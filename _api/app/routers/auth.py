@@ -20,7 +20,7 @@ async def login(form_data: Annotated[OAuth2PasswordRequestForm, Depends()], db: 
     return auth.login(form_data, db)
 
 @router.post("/api/register")
-async def register(form_data: Annotated[RequestUserCreate, Depends()], db: Session = Depends(get_db)):
+async def register(form_data: RequestUserCreate, db: Session = Depends(get_db)):
     return auth.register(form_data, db)
 
 @router.get("/api/status")

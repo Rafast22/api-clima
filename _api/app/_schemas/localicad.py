@@ -9,7 +9,7 @@ class RequestLocalidadBase(BaseModel):
     # user:Union[None] = None
     latitude: str 
     longitude: str
-    user_id:int
+    user_id:int | None = None
     cultivo_id:int | None = None
         
 class RequestLocalidadCreate(RequestLocalidadBase):

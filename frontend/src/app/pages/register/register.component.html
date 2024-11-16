@@ -1,60 +1,74 @@
-<div class="caixa">
-  <div class="caixa-login">
-    <div class="area-de-login">
-      <h2 class="primeiro-titulo">Bienvenido a TuClima</h2>
-      <p class="p-titulo1">Para acceder, registrate</p>
-      <button class="botao-entrar" (click)="btnEntrar()" >Entrar</button>
-    </div>
-    <div class="criar-login">
-      <h2 class="segundo-titulo">Crear cuenta</h2>
-      <div class="icones-gerais">
-        <div class="icones-redes">
-          <mat-icon class="fa-brands fa-facebook-f">facebook</mat-icon>
-          <!-- <span><i class="fa-brands fa-facebook-f"></i></span> -->
+<div class="body">
+  <div class="container">
+    <div class="register-box">
+        <div class="register-left">
+            <h2>Crear una cuenta</h2>
+            <div class="social-register">
+              <mat-icon  style="width: 30px; height: 30px; margin-right: 15px;" svgIcon="facebook" class="clickable-icon">facebook</mat-icon>
+                <mat-icon  style="width: 30px; height: 30px;" svgIcon="google" class="clickable-icon"></mat-icon>
+            </div>
+            <p>O registrarse con:</p>
+            <form  class="form" (ngSubmit)="register()" [formGroup]="formulario">
+                <mat-form-field>
+                  <mat-label>Nombre completo</mat-label>
+                  <input
+                    matInput
+                    placeholder="Nombre completo"
+                    [formControl]="full_name"
+                    (blur)="updateErrorMessage('full_name')"
+                    required
+                  />
+                  @if (email.invalid) {
+                    <mat-error>{{errorMessageName()}}</mat-error>
+                  }
+                </mat-form-field>
+                <mat-form-field>
+                  <mat-label>Correo electrónico</mat-label>
+                  <input
+                    matInput
+                    placeholder="pat@example.com"
+                    [formControl]="email"
+                    (blur)="updateErrorMessage('email')"
+                    required
+                  />
+                  @if (email.invalid) {
+                    <mat-error>{{errorMessageEmail()}}</mat-error>
+                  }
+                </mat-form-field>
+                <mat-form-field>
+                  <mat-label>Contraseña</mat-label>
+                  <input
+                    matInput
+                    type="password" 
+                    [formControl]="password"
+                    (blur)="updateErrorMessage('password')"
+                    required
+                  />
+                  @if (password.invalid) {
+                    <mat-error>{{errorMessagePassword()}}</mat-error>
+                  }
+                </mat-form-field>  
+                <!-- <mat-form-field>
+                  <mat-label>Confirmar contraseña</mat-label>
+                  <input
+                    matInput
+                    type="password" 
+                    [formControl]="confirmPassword"
+                    (blur)="updateErrorMessage('confirmPassword')"
+                    required
+                  />
+                  @if (password.invalid) {
+                    <mat-error>{{errorMessageConfirmPassword()}}</mat-error>
+                  }
+                </mat-form-field>   -->
+                <button type="submit">REGISTRARME</button>
+            </form>
         </div>
-        <div class="icones-redes">
-          <!-- <span><i class="fa-brands fa-google-plus-g"></i></span> -->
-          <mat-icon svgIcon="google"></mat-icon>
+        <div class="register-right">
+            <h2>Bienvenido!</h2>
+            <p>Ya tienes una cuenta? Inicia sesión para continuar</p>
+            <button (click)="btnEntrar()">INICIAR SESIÓN</button>
         </div>
-        <!-- <div class="icones-redes">
-          <span><i class="fa-brands fa-linkedin-in"></i></span>
-        </div> -->
-      </div>
-      <p class="p-titulo2">O registrate con las cuentas de:</p>
-      <form class="form" (ngSubmit)="register()" [formGroup]="formulario">
-
-        <label  class="form-login" for="nome">
-          <i class="far fa-user icon-modify"></i>
-          <input type="text" id="nome" placeholder="Nombre" formControlName="nome">
-        </label>
-        <span *ngIf="(formulario.get('nome')?.touched || submetido) && formulario.get('nome')?.errors?.['required']">
-          Campo obligatorio
-        </span>
-
-        <label class="form-login" for="email">
-          <i class="far fa-envelope icon-modify"></i>
-          <input type="text" id="email" placeholder="E-mail" formControlName="email">
-        </label>
-        <span *ngIf="(formulario.get('email')?.touched || submetido) && formulario.get('email')?.errors?.['required']">
-          Campo obligatorio
-        </span>
-        <span *ngIf="formulario.get('email')?.touched && formulario.get('email')?.status === 'INVALID'">
-          Deve ser um e-mail válido
-        </span>
-
-        <label class="form-login" for="senha">
-          <i class="fas fa-lock icon-modify"></i>
-          <input type="password" id="senha" placeholder="Contraseña" formControlName="senha">
-        </label>
-        <span *ngIf="(formulario.get('senha')?.touched || submetido) && formulario.get('senha')?.errors?.['required']">
-          Campo obligatorio
-        </span>
-        <span *ngIf="formulario.get('senha')?.touched && formulario.get('senha')?.status === 'INVALID'">
-         La contraseña debe tener como mínimo 8 caracteres, por lo menos 1 letra mayuscula, 1 minúscula, 1 número y 1 caracter especial
-        </span>
-        <br>
-        <button class="botao-form" type="submit">Registrarse</button>
-      </form>
     </div>
-  </div>
+  </div> 
 </div>
