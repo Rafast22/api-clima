@@ -12,26 +12,29 @@
 			"label": "tsc: inspección: tsconfig.spec.json"
 		},
 		{
-            "label": "Run server",
-            "type": "shell",
-            "command": "source ${workspaceFolder}/../_api/.env/bin/activate; cd ${workspaceFolder}/../_api; uvicorn app.main:app",
-			// --workers 3 
-            "problemMatcher": [],
-            "group": {
-                "kind": "build"
-                
-            }
-        },
+			"label": "Run server",
+			"type": "shell",
+			"command": "source ${workspaceFolder}/../_api/.env/bin/activate; cd ${workspaceFolder}/../_api; uvicorn app.main:app",
+			"problemMatcher": [],
+			"group": {
+				"kind": "build"
+			}
+		},
 		{
-            "label": "serve",
-            "type": "shell",
-            "command": "npm run start",
-			// --workers 3 
-            "problemMatcher": [],
-            "group": {
-                "kind": "build"
-                
-            }
-        }
+			"label": "serve",
+			"type": "shell",
+			"command": "npm run start",
+			"problemMatcher": [],
+			"group": {
+				"kind": "build"
+			}
+		},
+		{
+			"type": "npm",
+			"script": "ng",
+			"problemMatcher": [],
+			"label": "npm: ng",
+			"detail": "ng"
+		}
 	]
 }

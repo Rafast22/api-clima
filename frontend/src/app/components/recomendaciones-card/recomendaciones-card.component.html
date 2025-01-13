@@ -1,66 +1,114 @@
 <body>
   <div class="container">
+
+@if(!hideHeader){
+  <div  class="header">
+    <mat-toolbar>
+      <span>Recomendaciones</span>
+    </mat-toolbar>
+  </div>
+  <div class="header">
+    <mat-accordion >
+      <mat-expansion-panel [(expanded)]="CardClimaOpen"  >
+        <mat-expansion-panel-header>
+          <mat-panel-title>
+            Clima 7 días
+          </mat-panel-title>
+          <!-- <mat-panel-description style="justify-content: center ;">
+            Currently I am 
+          </mat-panel-description> -->
+        </mat-expansion-panel-header>
+        <app-clima-card [predicciones]="predicciones"></app-clima-card>
+      </mat-expansion-panel>
+    </mat-accordion>
+  </div>
+}
+    
     <div class="header">
-      <mat-toolbar>
-        <span>Recomendaciones de días óptimos</span>
-      </mat-toolbar>
+      <mat-accordion >
+        <mat-expansion-panel [(expanded)]="CardDiasOptimos"  >
+          <mat-expansion-panel-header>
+            <mat-panel-title>
+              Días óptimos
+            </mat-panel-title>
+            <!-- <mat-panel-description>
+              Currently I am 
+            </mat-panel-description> -->
+          </mat-expansion-panel-header>
+          <div class="filters">
+            <section>
+              <mat-form-field>
+                <mat-label>Periodo</mat-label>
+                <mat-date-range-input  [rangePicker]="picker">
+                  <input matStartDate #dateRangeStart placeholder="Fecha de Inicio">
+                  <input matEndDate #dateRangeEnd placeholder="Fecha Final"  (dateChange)="_onSelectedChange(dateRangeStart, dateRangeEnd)"> 
+                </mat-date-range-input>
+                <mat-hint>Dia/Mes/Ano - Dia/Mes/Ano</mat-hint>
+                <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
+                <mat-date-range-picker [touchUi]="isMobile" #picker>
+                  @if (isMobile) {
+                  <mat-date-range-picker-actions>
+                    <button mat-button matDateRangePickerCancel>Cancelar</button>
+                    <button mat-raised-button matDateRangePickerApply>Aplicar</button>
+                  </mat-date-range-picker-actions>
+                  }
+                </mat-date-range-picker>
+                
+              </mat-form-field>
+              <mat-form-field>
+                <mat-label>Cultivo:</mat-label>
+                <mat-select [(value)]="filtros.cultivoSeleccionado">
+                  @for (cultivo of cultivos; track cultivo) {
+                  <mat-option [value]="cultivo.value">{{cultivo.description}}</mat-option>
+                  }
+                </mat-select>
+              </mat-form-field>
+              <mat-form-field>
+                <mat-label>Tipo de actividad:</mat-label>
+                <mat-select [(value)]="filtros.tipoActividadSeleccionado">
+                  @for (tipoAc of tipo; track tipoAc) {
+                  <mat-option [value]="tipoAc.value">{{tipoAc.description}}</mat-option>
+                  }
+                </mat-select>
+              </mat-form-field>
+            </section>
+            <section>
+              <button mat-flat-button color="primary" (click)="cargarClick()">Cargar</button>
+              <button mat-flat-button color="primary" (click)="limpiarClick()">Limpiar</button>
+            </section>
+      
+          </div>
+          <div class="content">
+            <div class="calendar">
+              <app-calendar  #calendarComponent [ListPerfectDays]="perfect" [perfectDays]="perfectDays" (selectedDay)="_onChangeDate($event)"></app-calendar>
+      
+            </div>
+            <div class="chart-container">
+              <h3>Reporte de condiciones climáticas</h3>
+              <canvas id="chart"></canvas>
+            </div>
+          </div>
+        </mat-expansion-panel>
+      </mat-accordion>
     </div>
-    <app-clima-card></app-clima-card>
 
-    <div class="filters">
-      <section>
-        <mat-form-field>
-          <mat-label>Periodo</mat-label>
-          <mat-date-range-input [rangePicker]="picker">
-            <input matStartDate placeholder="Fecha de Inicio">
-            <input matEndDate placeholder="Fecha Final">
-          </mat-date-range-input>
-          <mat-hint>Dia/Mes/Ano - Dia/Mes/Ano</mat-hint>
-          <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
-          <mat-date-range-picker [touchUi]="isMobile" #picker>
-            @if (isMobile) {
-            <mat-date-range-picker-actions>
-              <button mat-button matDateRangePickerCancel>Cancel</button>
-              <button mat-raised-button matDateRangePickerApply>Apply</button>
-            </mat-date-range-picker-actions>
-            }
-          </mat-date-range-picker>
-        </mat-form-field>
-        <mat-form-field>
-          <mat-label>Cultivo:</mat-label>
-          <mat-select>
-            @for (cultivo of cultivos; track cultivo) {
-            <mat-option [value]="cultivo.value">{{cultivo.description}}</mat-option>
-            }
-          </mat-select>
-        </mat-form-field>
-        <mat-form-field>
-          <mat-label>Tipo de actividad:</mat-label>
-          <mat-select>
-            @for (tipoAc of tipo; track tipoAc) {
-            <mat-option [value]="tipoAc.value">{{tipoAc.description}}</mat-option>
-            }
-          </mat-select>
-        </mat-form-field>
-      </section>
-      <section>
-        <button mat-flat-button color="primary" (click)="cargarClick()">Cargar</button>
-      </section>
-
-    </div>
-    <div class="content">
-      <div class="calendar">
-        <app-calendar  #calendarComponent [ListPerfectDays]="perfect" [perfectDays]="perfectDays" (selectedDay)="_onChangeDate($event)"></app-calendar>
-
-      </div>
-      <div class="chart-container">
-        <h3>Reporte de condiciones climáticas</h3>
-        <canvas id="chart"></canvas>
-      </div>
-    </div>
+    
     <div class="details" id="details">
       <h3>Detalles del día</h3>
-      <p>Seleccione un día para ver los detalles.</p>
+      @if(_diaSelecionado){
+        <p>Seleccione un día para ver los detalles.</p>
+      }
+      @else{
+       <div class="row">
+        <div class="linha">Temperatura Media del dia {{this.diaSeleccionado.Dia.getDate()}} es: {{this.diaSeleccionado.TemperaturaMedia}}</div>
+        <div class="linha">Humedad Media del dia {{this.diaSeleccionado.Dia.getDate()}} es: {{this.diaSeleccionado.HumedadMedia}}</div>
+        <div class="linha">Precipitacion Media del dia {{this.diaSeleccionado.Dia.getDate()}} es: {{this.diaSeleccionado.PrecipitacionMedia}}</div>
+       </div>
+       <div class="center" style="display: flex;justify-content: center;">
+          <div class="" style="font-weight: bold;">Es un dia Favorable para la {{this.getTipoSelecionado}} de {{this.getCultivoSelecionado}}</div>
+       </div>
+        
+      }
     </div>
   </div>
 </body>

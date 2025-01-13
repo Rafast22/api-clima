@@ -15,12 +15,14 @@
             <div style="font-size: 48px;">
                 <img [src]="day.iconUrl" width="48" height="48" alt="Nubes y claros">
             </div>
-            <div class="div" style="margin-bottom: 16px; position: relative;">
+            <div class="column">
+                <span style="color: #2A65CB; padding: 5px;">{{day.min}}</span>
+                <span>/</span>
+                <span style="color: #CB2C2A; padding: 5px;">{{day.max}}</span>
+            </div>
+            <div class="div row" style="margin-top: 16px; position: relative;">
                 <span style="color: #2A65CB;">{{day.precip}}</span>
-                </div>
-            <div class="row">
-                <span style="color: #2A65CB;">{{day.min}}</span>
-                <span style="color: #CB2C2A;">{{day.max}}</span>
+                <span style="color: #1459d1; font-size: smaller; font-weight: bold;">{{day.precipMM}}</span>
             </div>
             
         </div>

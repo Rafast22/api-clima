@@ -16,11 +16,19 @@ export class PredicService {
 
    }
 
-    public getPredictData(user_id:number):Promise<any>{
-      const body = new HttpParams()
-        .set('user_id', user_id ?? "")
-      const request$ = this.http.get<any>(`${baseUrl}/historico/${user_id}`, { headers: this.headers }).pipe(take(1));
-      return lastValueFrom(request$);
+    public getPredictData( tipo:number, cultivo:number, fecha_inicial?:string, fecha_final?:string):Promise<any>{
+      const params = new HttpParams()
+        .set('fecha_inicio', fecha_inicial ?? "")
+        .set('fecha_final', fecha_final ?? "")
+        .set('tipo', tipo ?? "")
+        .set('cultivo', cultivo ?? "")
+        return lastValueFrom(
+          this.http.post<any>(`${baseUrl}/previciones`, null, {
+            headers: this.headers,
+            params
+          })
+        );
+    
     }
     
     public getPredictDataDay(user_id:number, Day:string):Promise<any>{

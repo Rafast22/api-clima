@@ -111,7 +111,7 @@ def register(request_user:RequestUserCreate, db: Session) -> RequestUser:
 
 def login(form_data: OAuth2PasswordRequestForm, db: Session) -> RequestToken:
     user = authenticate_user(db, form_data.username, form_data.password)
-    if not user:
+    if not user is User:
         raise HTTPException(
             status_code=httpStatus.HTTP_401_UNAUTHORIZED,
             detail="Incorrect username or password",

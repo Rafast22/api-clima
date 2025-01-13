@@ -9,7 +9,7 @@ from sqlalchemy.orm import Session
 from datetime import date, datetime
 router = APIRouter()
 
-@router.get("/api/previciones/{fecha_inicio}:{fecha_final}")
+@router.post("/api/previciones")
 async def get_previcion(fecha_inicio:date, fecha_final:date,tipo:int, cultivo:int,   is_autenticate: Annotated[bool, Depends(is_user_autenticate)], db: Session = Depends(get_db)):
     return previcion.get_previcion(db, fecha_inicio, fecha_final, tipo, cultivo)
 

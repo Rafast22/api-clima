@@ -7,11 +7,12 @@ import { TesteComponent } from './pages/teste/teste.component';
 import { RecomendacionesCardComponent } from './components/recomendaciones-card/recomendaciones-card.component';
 
 export const routes: Routes = [
+    { path: "", component: LoginComponent, pathMatch: "full", canActivate: [authGuard]  },
     { path: "login", component: LoginComponent, pathMatch: "full" },
     { path: "register", component: RegisterComponent, pathMatch: "full" },
-    { path: "principal", component: PrincipalComponent, pathMatch: "full", /*canActivate: [authGuard] */},
+    { path: "principal", component: PrincipalComponent, pathMatch: "full", canActivate: [authGuard] },
     { path: "testeAngular", component: TesteComponent, pathMatch: "full" },
-    { path: "recomendaciones", component: RecomendacionesCardComponent, pathMatch: "full" },
+    { path: "recomendaciones", component: RecomendacionesCardComponent, pathMatch: "full", canActivate: [authGuard]},
   ];
   
 

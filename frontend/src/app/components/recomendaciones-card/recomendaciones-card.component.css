@@ -31,7 +31,10 @@
     justify-items: center;
 }
 mat-form-field{
-    width: 250px;
+    width: 300px;
+}
+mat-accordion{
+    width: 100%;
 }
 .header h2 {
     text-align: center;
@@ -45,7 +48,7 @@ mat-form-field{
     display: flex;
     flex-direction: column;
     gap: 20px;
-    width: 80vw;
+    width: 100%;
 }
 @media (min-width: 768px) {
     .content {
@@ -57,7 +60,10 @@ mat-form-field{
         width: 50%;
     }
 }
-
+.row{
+        display: grid;
+        grid-template-columns: 1fr 1fr 1fr; /* Duas colunas de mesma largura */
+      }
 .calendar {
     text-align: center;
     padding: 5px;
@@ -79,7 +85,6 @@ mat-form-field{
     background-color: #f9f9f9;
     border-radius: 10px;
     padding: 10px;
-    display: none;
 }
 .details h3 {
     margin-top: 0;
@@ -91,7 +96,7 @@ label {
     font-weight: bold;
 }
  .filters {
-    width: 80vw;
+    width: 100%;
     padding: 5px;
     margin-bottom: 10px;
     border: 1px solid #ccc;
@@ -101,8 +106,14 @@ label {
     justify-items: center;
     justify-content: center;
 }
+mat-panel-title{ 
+    justify-content: center;
+    font-size: medium;
+}
 
 .chart-container {
+    border: 1px solid #ccc;
+
     background-color: #f9f9f9;
     border-radius: 10px;
     padding: 10px;
