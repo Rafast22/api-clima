@@ -6,7 +6,6 @@ import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { BreakpointObserver } from '@angular/cdk/layout';
 import { MatSelectModule } from '@angular/material/select';
-import { CalendarDatapickerRangeComponent } from '../calendar-datapicker-range/calendar-datapicker-range.component';
 import Chart from 'chart.js/auto';
 import { MatButtonModule } from '@angular/material/button';
 import { MatToolbarModule } from '@angular/material/toolbar';
