@@ -1,5 +1,5 @@
 # Use a imagem base do Python com a versão desejada
-FROM python:3.9-slim-buster
+FROM python:3.11-slim-buster
 
 # Define o diretório de trabalho dentro do container
 WORKDIR /app
@@ -8,8 +8,8 @@ WORKDIR /app
 COPY requirements.txt requirements.txt
 
 # Instala as dependências
-RUN pip install --no-cache-dir -r requirements.txt
-
+#RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install -r requirements.txt
 # Copia o restante do código para o container
 COPY . .
 
