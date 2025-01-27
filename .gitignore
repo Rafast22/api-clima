@@ -44,3 +44,7 @@ _api/app/interceptor/helpers/__pycache__
 _api/app/interceptor/interfaces/__pycache__
 _api/app/routers/__pycache__
 frontend/"/home/adriana/Proyectos/api-clima/frontend/DevProfile"/AutofillStates/2024.7.12.235938/IR
+_api/app/__pycache__/
+_api/app/__pycache__/*
+_api/app/routers/__pycache__/
+_api/app/routers/__pycache__/*

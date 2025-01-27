@@ -1,0 +1,39 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:latest
+    container_name: postgres_container
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: Rei12Rom@
+      POSTGRES_DB: DB
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  python:
+    # image: python:3.11-slim-buster
+    build: .
+    container_name: python_container
+    depends_on:
+      - postgres
+    volumes:
+      - .:/app
+    working_dir: /app
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+    ports:
+      - "8000:8000"
+    environment:
+      DATABASE_URL: postgresql://postgres:Rei12Rom%40@postgres:5432/DB
+      SECRET_KEY: 8b5a1650bd34eda3385b11cc27ba36e783ec966e3cb5ca38e96bad77d417569cc33c9d2be10f470b32b277067623ccbe577f00228710bbbe3744197d4f92
+      ALGORITHM: HS256 
+      ACCESS_TOKEN_EXPIRE_MINUTES: 30
+      SENDER_EMAIL: teste
+      SMTP_PASSWORD: test
+      SMTP_SERVER: test30
+      SMTP_PORT: 8080
+
+volumes:
+  postgres_data:
