@@ -1,0 +1,16 @@
+.example-spacer {
+    flex: 1 1 auto;
+  }
+  .tema-dark {
+    background-color: #282A36;
+    color: #F8F8F2;
+  }
+  .dark{
+    background-color:  #44475A;
+  }
+
+  mat-drawer-content{
+    overflow-y: auto;
+    /* height: calc(100vh - 64px); Altura da tela menos a altura do mat-tab */
+    height: calc(100vh - 64px);
+  }
