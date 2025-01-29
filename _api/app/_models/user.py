@@ -1,13 +1,9 @@
 from sqlalchemy import Column, Integer, String, Boolean, DateTime, or_
 from sqlalchemy.sql import func
-from sqlalchemy.ext.declarative import declarative_base
-from pydantic import BaseModel
-from typing import Union
 from ..database import pwd_context, Base
 from .._schemas.user import RequestUserCreate, RequestUser
-from sqlalchemy.orm import Session, Query
+from sqlalchemy.orm import Session
 from fastapi import HTTPException, status
-from sqlalchemy.orm import relationship
 
 
 class User(Base):
@@ -42,15 +38,15 @@ class User(Base):
 
     def get_password_hash(password):
         return pwd_context.hash(password)
-
-
-
-
-def get_user_by_id(db: Session, user_id: int):
+    
+    # @property
+    # def passwrd(self):
+    #     return self._pass
+    # @passwrd.setter
+    # def passwrd(self, value):
+    #     self._pass = value
+def get_by_id(db: Session, user_id: int):
     return db.get(User, user_id)
-
-def get_user_by_email_or_username(db: Session, q: str):
-    return db.query(User).filter(or_(User.email == q, User.username == q)).first()
 
 def get_user_by_email(db: Session, q: str):
     return db.query(User).filter(User.email == q).first()
@@ -65,18 +61,17 @@ def get_user( db:Session, email: str=None, username: str = None):
     elif username:
         return get_user_by_username(db, username)
 
-def create_user(db: Session, user: RequestUserCreate):
+def create(db: Session, user: RequestUserCreate):
     db_user = User(user)
     db.add(db_user)
     db.commit()
     db.refresh(db_user)
-    return db_user
+    
 
-def update_user(db: Session, user: RequestUser):
+def update(db: Session, user: RequestUser):
     db_user = db.query(User).filter(User.id == user.id).first()
     if db_user is None:
         raise None
-
     for key, value in vars(user).items():
         setattr(db_user, key, value)
 
@@ -84,10 +79,8 @@ def update_user(db: Session, user: RequestUser):
     db.refresh(db_user)
     return db_user
 
-def delete_user(db: Session, user_id: int):
+def delete(db: Session, user_id: int):
     db_user = db.get(User, user_id)
-    if not db_user:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
     db.delete(db_user)
     db.commit()
 

@@ -1,14 +1,19 @@
-from sqlalchemy import Column, Integer, String, Boolean, DateTime, or_, ForeignKey
+from sqlalchemy import Column, Integer, String, DateTime, ForeignKey
 from sqlalchemy.sql import func
-from sqlalchemy.orm import relationship, Session
-from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy.orm import Session
 from ..database import Base
 from .._schemas.cultivo import RequestCultivoCreate, RequestCultivo
-from fastapi import HTTPException, status
-
 
 class Cultivo(Base):
     __tablename__ = "Cultivos"
+    def __init__(self, cultivo: RequestCultivo):
+        self.create_date = cultivo.create_date
+        self.update_date = cultivo.update_date
+        self.name = cultivo.name
+        self.variety = cultivo.variety
+        self.cycle_duration = cultivo.cycle_duration
+        self.user_id = cultivo.user_id
+
     id = Column(Integer, primary_key=True, index=True)
     create_date  = Column(DateTime, index=True, server_default=func.now(), nullable=False)
     update_date = Column(DateTime, index=True, onupdate=func.now(), nullable=False)
@@ -44,8 +49,6 @@ def update_cultivo(db: Session, cultivo: RequestCultivo):
 
 def delete_cultivo(db: Session, user_id: int):
     db_cultivo = db.get(Cultivo, user_id)
-    if not db_cultivo:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Cultivo not found")
     db.delete(db_cultivo)
     db.commit()
 

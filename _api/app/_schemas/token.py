@@ -1,5 +1,4 @@
 from pydantic import BaseModel
-from datetime import timedelta
 from typing import Union
 class RequestToken(BaseModel):
     access_token: str

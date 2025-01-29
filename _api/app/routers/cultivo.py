@@ -1,35 +1,51 @@
-from fastapi import Depends, APIRouter, HTTPException, status
-from typing import Union, Annotated
+from fastapi import Depends, APIRouter, status
+from typing import Annotated, List
 from .._schemas.cultivo import RequestCultivo, RequestCultivoCreate
-from .._view.cultivo import update, get_by_id, delete_cultivo, get_by_user_id, create
+from .._view.cultivo import (
+    update_cultivo as update_cultivo_view,
+    get_cultivo_by_id as get_cultivo_by_id_view, 
+    delete_cultivo_by_id as delete_cultivo_by_id_view, 
+    get_cultivos_by_user_id as get_cultivos_by_user_id_view, 
+    create_cultivo as create_cultivo_view
+)
 from ..database import get_db
-from .._view.auth import is_user_autenticate, get_current_user
+from .._view.auth import is_user_autenticate
 from sqlalchemy.orm import Session
 
 
-router = APIRouter()
-
-@router.post("/api/user/cultivo")
-async def create_localidad(cultivo: RequestCultivoCreate, is_autenticate: Annotated[bool, Depends(is_user_autenticate)], db: Session = Depends(get_db)):
-    create(db, cultivo)
-
-@router.put("/api/user/cultivo")
-async def put_user(user: Annotated[RequestCultivo, Depends()], is_autenticate: Annotated[bool, Depends(is_user_autenticate)], db: Session = Depends(get_db)):
-    return update(db, user)
+router = APIRouter(prefix="/api/user/cultivo", tags=["Cultivo"])
     
-@router.get("/api/user/cultivo/{cultivo_id}")
-async def get_user(cultivo_id: int, is_autenticate: Annotated[bool, Depends(is_user_autenticate)], db: Session = Depends(get_db)):
-    return get_by_id(db, cultivo_id)
+@router.get("/{cultivo_id}", response_model=RequestCultivo)
+async def get_cultivo_by_id(cultivo_id: int, 
+                            is_autenticate: Annotated[bool, Depends(is_user_autenticate)], 
+                            db: Session = Depends(get_db)
+                            ):
+    return get_cultivo_by_id_view(db, cultivo_id)
 
-@router.get("/api/user/cultivo/{user_id}")
-async def get_user(user_id: int, is_autenticate: Annotated[bool, Depends(is_user_autenticate)], db: Session = Depends(get_db)):
-    return get_by_user_id(db, user_id)
-    
+@router.get("/{user_id}", response_model=List[RequestCultivo])
+async def get_cultivos_by_user_id(user_id: int, 
+                                  is_autenticate: Annotated[bool, Depends(is_user_autenticate)], 
+                                  db: Session = Depends(get_db)
+                                  ):
+    return get_cultivos_by_user_id_view(db, user_id)
 
-@router.delete("/api/user/cultivo/{cultivo_id}")
-async def get_user(cultivo_id: int, is_autenticate: Annotated[bool, Depends(is_user_autenticate)], db: Session = Depends(get_db)):
-    delete_cultivo(db, cultivo_id)
-    
-# @router.get("/users/me", response_model=None)
-# async def read_users_me(current_user: Annotated[User, Depends(get_current_user)]):
-#     return current_user
+@router.post("/", status_code=status.HTTP_201_CREATED)
+async def create_cultivo(cultivo: Annotated[RequestCultivoCreate, Depends()], 
+                         is_autenticate: Annotated[bool, Depends(is_user_autenticate)], 
+                         db: Session = Depends(get_db)
+                         ):
+    create_cultivo_view(db, cultivo)
+
+@router.put("/{cultivo_id}", status_code=status.HTTP_204_NO_CONTENT)
+async def update_cultivo(user: Annotated[RequestCultivo, Depends()], 
+                         is_autenticate: Annotated[bool, Depends(is_user_autenticate)], 
+                         db: Session = Depends(get_db)
+                         ):
+    return update_cultivo_view(db, user)
+
+@router.delete("/{cultivo_id}", status_code=status.HTTP_202_ACCEPTED)
+async def delete_cultivo_by_id(cultivo_id: int, 
+                               is_autenticate: Annotated[bool, Depends(is_user_autenticate)], 
+                               db: Session = Depends(get_db)
+                               ):
+    delete_cultivo_by_id_view(db, cultivo_id)

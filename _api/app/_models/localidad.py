@@ -1,7 +1,5 @@
-from sqlalchemy import Column, Integer, String, Boolean, DateTime, or_, ForeignKey, Numeric 
-from sqlalchemy.sql import func
-from sqlalchemy.orm import relationship, Session
-from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy import Column, Integer, String, ForeignKey
+from sqlalchemy.orm import Session
 from ..database import Base
 from .._schemas.localicad import RequestLocalidadCreate, RequestLocalidad
 from fastapi import HTTPException, status
@@ -42,7 +40,7 @@ def create(db: Session, localidad: RequestLocalidadCreate):
 
 def update(db: Session, localidad: RequestLocalidad):
     db_localidad = db.get(Localidad, localidad.id)
-    if db_localidad is None:
+    if not db_localidad:
         raise None
 
     for key, value in vars(localidad).items():
@@ -54,8 +52,6 @@ def update(db: Session, localidad: RequestLocalidad):
 
 def delete(db: Session, user_id: int):
     db_localidad = db.get(Localidad, user_id)
-    if not db_localidad:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Localidad not found")
     db.delete(db_localidad)
     db.commit()
 
