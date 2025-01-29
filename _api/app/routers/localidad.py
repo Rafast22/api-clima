@@ -52,7 +52,7 @@ async def delete_localidad_by_id(localidad_id: int,
     delete_localidad_by_id_view(db, localidad_id)
     
 @router.post("/", status_code=status.HTTP_201_CREATED)
-async def create_localidad(localidad: RequestLocalidadCreate, 
+async def create_localidad(localidad: Annotated[RequestLocalidadCreate, Depends()], 
                            is_autenticate: Annotated[bool, Depends(is_user_autenticate)], 
                            db: Session = Depends(get_db)):
     

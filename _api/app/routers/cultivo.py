@@ -30,7 +30,7 @@ async def get_cultivos_by_user_id(user_id: int,
     return get_cultivos_by_user_id_view(db, user_id)
 
 @router.post("/", status_code=status.HTTP_201_CREATED)
-async def create_cultivo(cultivo: RequestCultivoCreate, 
+async def create_cultivo(cultivo: Annotated[RequestCultivoCreate, Depends()], 
                          is_autenticate: Annotated[bool, Depends(is_user_autenticate)], 
                          db: Session = Depends(get_db)
                          ):

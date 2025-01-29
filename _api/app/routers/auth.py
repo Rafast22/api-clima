@@ -1,31 +1,34 @@
 # import jwt
-from fastapi import Depends, FastAPI, HTTPException, status
-from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
-# from jwt.exceptions import InvalidTokenError
-# from passlib.context import CryptContext
-from pydantic import BaseModel
+from fastapi import Depends, status, APIRouter
+from fastapi.security import OAuth2PasswordRequestForm
 from typing import Annotated
-from fastapi import Depends, APIRouter, HTTPException, status
-from .._view import auth
-from .._view.auth import is_user_autenticate
+from .._view.auth import (
+    is_user_autenticate,
+    register as register_view,
+    login as login_view,
+    status as status_view
+)
 from .._schemas.user import RequestUserCreate
+from .._schemas.token import RequestToken
+
 from sqlalchemy.orm import Session
 from ..database import get_db
 
-router = APIRouter()
+router = APIRouter(prefix="/api/auth", tags=["Auth"])
 
+@router.post("/login", response_model=RequestToken)
+async def login(form_data: Annotated[OAuth2PasswordRequestForm, Depends()], 
+                db: Session = Depends(get_db)):
+    return login_view(form_data, db)
 
-@router.post("/api/login")
-async def login(form_data: Annotated[OAuth2PasswordRequestForm, Depends()], db: Session = Depends(get_db)):
-    return auth.login(form_data, db)
+@router.post("/register")
+async def register(form_data: Annotated[RequestUserCreate, Depends()], 
+                   db: Session = Depends(get_db)):
+    register_view(form_data, db)
 
-@router.post("/api/register")
-async def register(form_data: RequestUserCreate, db: Session = Depends(get_db)):
-    return auth.register(form_data, db)
-
-@router.get("/api/status")
+@router.get("/status")
 async def status( is_autenticate: Annotated[bool, Depends(is_user_autenticate)]):
-    return auth.status()
+    return status_view()
 
 # @router.post("/logout")
 # async def logout(

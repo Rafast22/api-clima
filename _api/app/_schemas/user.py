@@ -1,10 +1,6 @@
-from sqlalchemy import Column, Integer, String, Boolean, DateTime, or_
-from sqlalchemy.sql import func
 from datetime import datetime
-from sqlalchemy.ext.declarative import declarative_base
 from pydantic import BaseModel, EmailStr, Field
 from typing import Union
-from sqlalchemy.orm import Session
 from .._schemas.cultivo import RequestCultivo
 
       
