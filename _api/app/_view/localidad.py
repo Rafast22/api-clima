@@ -10,8 +10,10 @@ async def update_localidad(db: Session, u: RequestLocalidad) -> RequestLocalidad
     try:
         db_localidad = localidad.get_by_id(db, u.id)
         if not db_localidad:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+            raise HTTPException()
         db_localidad = localidad.update(db, u)
+    except HTTPException:
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
     except :
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
     return db_localidad
@@ -21,6 +23,8 @@ async def get_localidad_by_id(db: Session, localidad_id:int ) -> RequestLocalida
         db_localidad = localidad.get_by_id(db, localidad_id)
         if not db_localidad:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+    except HTTPException:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
     except :
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
     return db_localidad
@@ -31,6 +35,8 @@ async def delete_localidad_by_id(db: Session, localidad_id:int ):
         if not db_localidad:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
         localidad.delete(db, localidad_id)
+    except HTTPException:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
     except:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
@@ -39,6 +45,8 @@ async def get_by_localidad_by_cultivo(db: Session, cultivo_id:int ) -> RequestLo
         db_localidad = localidad.get_by_cultivo_id(db, cultivo_id)
         if not db_localidad:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+    except HTTPException:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
     except :
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
     return db_localidad
@@ -48,6 +56,8 @@ async def get_localidades_by_user_id(db: Session, cultivo_id:int ) -> RequestLoc
         db_localidad = localidad.get_by_user_id(db, cultivo_id)
         if not db_localidad:
             raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+    except HTTPException:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
     except :
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
     return db_localidad
