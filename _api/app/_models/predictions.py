@@ -18,7 +18,7 @@ class Predictions(Base):
 
     
     id = Column(Integer, primary_key=True, index=True)
-    date = Column(String, nullable=True)
+    date = Column(DateTime, nullable=True)
     prectotcorr = Column(DECIMAL(10, 3), nullable=True)
     rh2m = Column(DECIMAL(10, 3), nullable=True)
     qv2m = Column(DECIMAL(10, 3), nullable=True)

@@ -1,6 +1,6 @@
 from fastapi import Depends, APIRouter, HTTPException, status
 from typing import Union, Annotated
-from .._schemas.user import RequestUserCreate, RequestUser
+from .._schemas.user import RequestUserCreate
 from .._models.user import User
 from .._view import previcion
 from ..database import get_db

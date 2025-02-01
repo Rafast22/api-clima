@@ -2,15 +2,17 @@ from sqlalchemy import Column, Integer, String, DateTime, ForeignKey
 from sqlalchemy.sql import func
 from sqlalchemy.orm import Session
 from ..database import Base
+from datetime import datetime
 from .._schemas.cultivo import RequestCultivoCreate, RequestCultivo
 
 class Cultivo(Base):
     __tablename__ = "Cultivos"
-    def __init__(self, cultivo: RequestCultivo):
-        self.create_date = cultivo.create_date
-        self.update_date = cultivo.update_date
+    def __init__(self, cultivo: RequestCultivoCreate):
+
         self.name = cultivo.name
         self.variety = cultivo.variety
+        self.create_date = datetime.now()
+        self.update_date = datetime.now()
         self.cycle_duration = cultivo.cycle_duration
         self.user_id = cultivo.user_id
 
@@ -20,7 +22,7 @@ class Cultivo(Base):
     name = Column(String, index=True, nullable=False)
     variety = Column(String, index=True, nullable=False)
     cycle_duration = Column(Integer, index=True, nullable=False)
-    user_id = Column(Integer, ForeignKey('User.id'), nullable=False)
+    user_id = Column(Integer, ForeignKey('User.id', ondelete="CASCADE"), nullable=False)
 
 def get_cultivo_by_id(db: Session, cultivo_id: int):
     return db.get(Cultivo, cultivo_id)
@@ -37,9 +39,6 @@ def create_cultivo(db: Session, cultivo: RequestCultivoCreate):
 
 def update_cultivo(db: Session, cultivo: RequestCultivo):
     db_cultivo = db.get(Cultivo, cultivo.id)
-    if db_cultivo is None:
-        raise None
-
     for key, value in vars(cultivo).items():
         setattr(db_cultivo, key, value)
 

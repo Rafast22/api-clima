@@ -1,4 +1,4 @@
-from fastapi import Depends, APIRouter, status
+from fastapi import Depends, APIRouter, status, Body
 from typing import Annotated, List
 from .._schemas.cultivo import RequestCultivo, RequestCultivoCreate
 from .._view.cultivo import (
@@ -22,7 +22,7 @@ async def get_cultivo_by_id(cultivo_id: int,
                             ):
     return get_cultivo_by_id_view(db, cultivo_id)
 
-@router.get("/{user_id}", response_model=List[RequestCultivo])
+@router.get("/u/{user_id}", response_model=List[RequestCultivo])
 async def get_cultivos_by_user_id(user_id: int, 
                                   is_autenticate: Annotated[bool, Depends(is_user_autenticate)], 
                                   db: Session = Depends(get_db)
@@ -30,15 +30,15 @@ async def get_cultivos_by_user_id(user_id: int,
     return get_cultivos_by_user_id_view(db, user_id)
 
 @router.post("/", status_code=status.HTTP_201_CREATED)
-async def create_cultivo(cultivo: Annotated[RequestCultivoCreate, Depends()], 
-                         is_autenticate: Annotated[bool, Depends(is_user_autenticate)], 
+async def create_cultivo(is_autenticate: Annotated[bool, Depends(is_user_autenticate)], 
+                         cultivo: RequestCultivoCreate = Body(...), 
                          db: Session = Depends(get_db)
                          ):
     create_cultivo_view(db, cultivo)
 
 @router.put("/{cultivo_id}", status_code=status.HTTP_204_NO_CONTENT)
-async def update_cultivo(user: Annotated[RequestCultivo, Depends()], 
-                         is_autenticate: Annotated[bool, Depends(is_user_autenticate)], 
+async def update_cultivo(is_autenticate: Annotated[bool, Depends(is_user_autenticate)], 
+                         user:RequestCultivo = Body(...), 
                          db: Session = Depends(get_db)
                          ):
     return update_cultivo_view(db, user)

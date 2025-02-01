@@ -1,14 +1,14 @@
 from .._models.user import User
 from .._models import user
-from .._schemas.user import RequestUser
+from .._schemas.user import RequestUserResponse, RequestUserUpdate
 from sqlalchemy.orm import Session
 from fastapi import HTTPException, status, Depends
 
 
-def update_user(db: Session , u: RequestUser) -> RequestUser:
+def update_user(db: Session , u: RequestUserUpdate) -> RequestUserUpdate:
 
     try:
-        db_user = user.get_user_by_email(db, u.email)
+        db_user = user.get_by_id(db, u.id)
         if not db_user:
             raise HTTPException
         u.password = User.get_password_hash(u.password)
@@ -20,7 +20,7 @@ def update_user(db: Session , u: RequestUser) -> RequestUser:
     
     return db_user
 
-def get_user_by_id(db: Session, user_id:int ) -> RequestUser:
+def get_user_by_id(db: Session, user_id:int ) -> RequestUserResponse:
     try:
         db_user = user.get_by_id(db, user_id)
     except Exception as ex:

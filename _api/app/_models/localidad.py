@@ -1,5 +1,5 @@
 from sqlalchemy import Column, Integer, String, ForeignKey
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, relationship
 from ..database import Base
 from .._schemas.localicad import RequestLocalidadCreate, RequestLocalidad
 from fastapi import HTTPException, status
@@ -11,13 +11,15 @@ class Localidad(Base):
         self.latitude = localidad.latitude
         self.longitude = localidad.longitude
         self.user_id = localidad.user_id
-        self.cultivo_id = localidad.cultivo_id
+        self.cultivo_id = localidad.cultivo_id if localidad.cultivo_id else None
     
     id = Column(Integer, primary_key=True, index=True)
     latitude = Column(String, index=True) 
     longitude = Column(String, index=True)
-    user_id = Column(Integer, ForeignKey('User.id'))
-    cultivo_id = Column(Integer, ForeignKey('Cultivos.id'), nullable=True)
+    user_id = Column(Integer, ForeignKey('User.id', ondelete="CASCADE"), nullable=False)
+    cultivo_id = Column(Integer, ForeignKey('Cultivos.id', ondelete="CASCADE"), nullable=True)  # Cultivo pode ser opcional
+    cultivo = relationship("Cultivo", backref="localidades", lazy="joined", foreign_keys=[cultivo_id])
+
    
     
 
