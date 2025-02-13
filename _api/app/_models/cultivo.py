@@ -1,6 +1,6 @@
 from sqlalchemy import Column, Integer, String, DateTime, ForeignKey
 from sqlalchemy.sql import func
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, relationship
 from ..database import Base
 from datetime import datetime
 from .._schemas.cultivo import RequestCultivoCreate, RequestCultivo
@@ -23,6 +23,8 @@ class Cultivo(Base):
     variety = Column(String, index=True, nullable=False)
     cycle_duration = Column(Integer, index=True, nullable=False)
     user_id = Column(Integer, ForeignKey('User.id', ondelete="CASCADE"), nullable=False)
+    localidad_id = Column(Integer, ForeignKey('Localidad.id', ondelete="CASCADE"), nullable=True)
+    localidad = relationship("Localidad")
 
 def get_cultivo_by_id(db: Session, cultivo_id: int):
     return db.get(Cultivo, cultivo_id)

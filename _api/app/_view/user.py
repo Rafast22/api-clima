@@ -10,11 +10,18 @@ def update_user(db: Session , u: RequestUserUpdate) -> RequestUserUpdate:
     try:
         db_user = user.get_by_id(db, u.id)
         if not db_user:
-            raise HTTPException
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+        
+        if user.get_user_by_email(db, u.email):
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="{'error':'email already used'}")
+        if user.get_user_by_username(db, u.username):
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="{'error':'user already used'}")
+
+        
         u.password = User.get_password_hash(u.password)
         db_user = user.update(db, u)
     except HTTPException as ex:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
     except Exception as ex:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(ex))
     

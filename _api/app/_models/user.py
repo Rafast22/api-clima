@@ -29,6 +29,7 @@ class User(Base):
     date_joined = Column(DateTime, index=True, server_default=func.now())
     role = Column(String, index=True, default="User")
     cultivos = relationship("Cultivo", backref="User", cascade="all, delete-orphan", passive_deletes=True)
+    localidades = relationship("Localidad", backref="User", cascade="all, delete-orphan", passive_deletes=True)
     
     
 

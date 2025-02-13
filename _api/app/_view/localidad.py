@@ -1,12 +1,13 @@
-from .._models import localidad, nasa_data
+from .._models import localidad
 from .._models.user import get_by_id as get_user_by_id
 from .._models.cultivo import get_cultivo_by_id
 import asyncio
-from .._schemas.localicad import RequestLocalidad, RequestLocalidadCreate
+from .._schemas.localidad import RequestLocalidad, RequestLocalidadCreate
 from .._schemas.nasa_data import RequestDataCreate
 from sqlalchemy.orm import Session
 from ..interceptor.nasa_request import get_history_date
-from fastapi import HTTPException, status, Depends
+from ..interceptor import predict
+from fastapi import HTTPException, status, BackgroundTasks
 
 def update_localidad(db: Session, u: RequestLocalidad) -> RequestLocalidad:
 
@@ -65,21 +66,30 @@ def get_localidades_by_user_id(db: Session, cultivo_id:int ) -> RequestLocalidad
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
     return db_localidad
 
-async def create_localidad(db: Session, u: RequestLocalidadCreate):
+async def create_localidad(db: Session, local: RequestLocalidadCreate, background_tasks: BackgroundTasks):
     try:
-        history_data:list[RequestDataCreate] = await get_history_date(u.latitude, u.longitude)
-        if u.user_id:
-            user = get_user_by_id(db, u.user_id)
+        
+        if local.user_id:
+            user = get_user_by_id(db, local.user_id)
             if not user:
                 raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="'User' not found")
-        if u.cultivo_id:
-                    cultivo = get_cultivo_by_id(db, u.cultivo_id)
+        if local.cultivo_id:
+                    cultivo = get_cultivo_by_id(db, local.cultivo_id)
                     if not cultivo:
                         raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY, detail="'Cultivo' not found")
 
-        db_localidad = localidad.create(db, u)
-        nasa_data.create_bulk(db, history_data,db_localidad.id)
+        db_localidad = localidad.create(db, local)
+        background_tasks.add_task(make_predictions, db, db_localidad)
+
+        # nasa_data.create_bulk(db, history_data,db_localidad.id)
     except HTTPException:
         raise HTTPException(status_code=status.HTTP_422_UNPROCESSABLE_ENTITY)
+    except Exception as ex:
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(ex))
+
+async def make_predictions(db:Session, local:localidad.Localidad):
+    try:
+        data = await get_history_date(local.latitude, local.longitude)
+        predict.predict(db , data, local)
     except Exception as ex:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(ex))

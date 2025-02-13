@@ -19,7 +19,7 @@ IS_DOCKER = os.getenv('IS_DOCKER')
 
 # DATABASE_URL = POSTGRESQL_URL
 # DATABASE_URL = SQLITE_URL
-# DATABASE_URL = 'postgresql://postgres:Rei12Rom%40@localhost:5432/DB'
+DATABASE_URL = 'postgresql://postgres:Rei12Rom%40@localhost:5432/DB'
 
 if not IS_DOCKER:
     if gettrace():
@@ -39,7 +39,7 @@ if not IS_DOCKER:
 
 
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="api/login")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="api/auth/login")
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
@@ -52,6 +52,6 @@ def get_db():
     finally:
         db.close()
         
-async def create_database():
+async def create_databases():
     Base.metadata.create_all(bind=engine)
     

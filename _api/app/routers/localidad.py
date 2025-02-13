@@ -1,6 +1,6 @@
-from fastapi import Depends, APIRouter, status, Body
+from fastapi import Depends, APIRouter, status, Body, BackgroundTasks
 from typing import Annotated, List
-from .._schemas.localicad import RequestLocalidad, RequestLocalidadCreate
+from .._schemas.localidad import RequestLocalidad, RequestLocalidadCreate
 from .._view.localidad import (
     update_localidad as update_localidad_view,
     get_localidad_by_id as get_localidad_by_id_view,
@@ -54,8 +54,9 @@ async def delete_localidad_by_id(localidad_id: int,
 @router.post("/", status_code=status.HTTP_201_CREATED)
 async def create_localidad(is_autenticate: Annotated[bool, Depends(is_user_autenticate)], 
                            localidad: RequestLocalidadCreate = Body(...), 
-                           db: Session = Depends(get_db)):
+                           db: Session = Depends(get_db),
+                           background_tasks: BackgroundTasks = BackgroundTasks()):
     
-    await create_localidad_view(db, localidad)
+    await create_localidad_view(db, localidad, background_tasks)
     
     
