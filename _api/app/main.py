@@ -8,8 +8,6 @@ from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
 from apscheduler.schedulers.background import BackgroundScheduler
 from .interceptor.predict import predict
-import aiohttp
-import requests
 
 router = APIRouter()
 # templates = Jinja2Templates(directory="/home/rafa/Projects/Python/api-clima/frontend/dist/front/browser/")

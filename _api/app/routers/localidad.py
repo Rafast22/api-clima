@@ -1,6 +1,6 @@
-from fastapi import Depends, APIRouter, status
+from fastapi import Depends, APIRouter, status, Body, BackgroundTasks
 from typing import Annotated, List
-from .._schemas.localicad import RequestLocalidad, RequestLocalidadCreate
+from .._schemas.localidad import RequestLocalidad, RequestLocalidadCreate
 from .._view.localidad import (
     update_localidad as update_localidad_view,
     get_localidad_by_id as get_localidad_by_id_view,
@@ -17,8 +17,8 @@ from sqlalchemy.orm import Session
 router = APIRouter(prefix="/api/user/cultivo/localidad", tags=["Localidad"])
 
 @router.put("/", status_code=status.HTTP_204_NO_CONTENT)
-async def update_localidad(localidad: Annotated[RequestLocalidad, Depends()], 
-                           is_autenticate: Annotated[bool, Depends(is_user_autenticate)], 
+async def update_localidad(is_autenticate: Annotated[bool, Depends(is_user_autenticate)],
+                           localidad: RequestLocalidad = Body(...),  
                            db: Session = Depends(get_db)):
     
     return update_localidad_view(db, localidad)
@@ -30,7 +30,7 @@ async def get_localidad_by_id(localidad_id: int,
     
     return get_localidad_by_id_view(db, localidad_id)
 
-@router.get("/cultivo/{cultivo_id}", response_model=RequestLocalidad)
+@router.get("/cultivo/{cultivo_id}", response_model=List[RequestLocalidad])
 async def get_by_localidad_by_cultivo(cultivo_id: int, 
                                       is_autenticate: Annotated[bool, Depends(is_user_autenticate)], 
                                       db: Session = Depends(get_db)):
@@ -52,10 +52,11 @@ async def delete_localidad_by_id(localidad_id: int,
     delete_localidad_by_id_view(db, localidad_id)
     
 @router.post("/", status_code=status.HTTP_201_CREATED)
-async def create_localidad(localidad: Annotated[RequestLocalidadCreate, Depends()], 
-                           is_autenticate: Annotated[bool, Depends(is_user_autenticate)], 
-                           db: Session = Depends(get_db)):
+async def create_localidad(is_autenticate: Annotated[bool, Depends(is_user_autenticate)], 
+                           localidad: RequestLocalidadCreate = Body(...), 
+                           db: Session = Depends(get_db),
+                           background_tasks: BackgroundTasks = BackgroundTasks()):
     
-    return create_localidad_view(db, localidad)
+    await create_localidad_view(db, localidad, background_tasks)
     
     

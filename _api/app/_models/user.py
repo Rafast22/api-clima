@@ -1,14 +1,14 @@
 from sqlalchemy import Column, Integer, String, Boolean, DateTime, or_
 from sqlalchemy.sql import func
 from ..database import pwd_context, Base
-from .._schemas.user import RequestUserCreate, RequestUser
-from sqlalchemy.orm import Session
+from .._schemas.user import RequestUserCreate, RequestUserUpdate
+from sqlalchemy.orm import Session, relationship
 from fastapi import HTTPException, status
 
 
 class User(Base):
     __tablename__ = "User"
-    def __init__(self, user:RequestUser, user_id:int=None):
+    def __init__(self, user:RequestUserCreate | RequestUserUpdate, user_id:int=None):
         self.username = user.username 
         if user.password:
             self.password = pwd_context.hash(user.password)
@@ -28,7 +28,8 @@ class User(Base):
     last_login = Column(DateTime, index=True, onupdate=func.now())
     date_joined = Column(DateTime, index=True, server_default=func.now())
     role = Column(String, index=True, default="User")
-    # cultivos = relationship("Cultivos", back_populates="user", cascade="all, delete-orphan")
+    cultivos = relationship("Cultivo", backref="User", cascade="all, delete-orphan", passive_deletes=True)
+    localidades = relationship("Localidad", backref="User", cascade="all, delete-orphan", passive_deletes=True)
     
     
 
@@ -68,7 +69,7 @@ def create(db: Session, user: RequestUserCreate):
     db.refresh(db_user)
     
 
-def update(db: Session, user: RequestUser):
+def update(db: Session, user: RequestUserUpdate):
     db_user = db.query(User).filter(User.id == user.id).first()
     if db_user is None:
         raise None

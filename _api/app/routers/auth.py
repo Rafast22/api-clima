@@ -1,5 +1,5 @@
 # import jwt
-from fastapi import Depends, status, APIRouter
+from fastapi import Depends, status, APIRouter, Body
 from fastapi.security import OAuth2PasswordRequestForm
 from typing import Annotated
 from .._view.auth import (
@@ -22,7 +22,7 @@ async def login(form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
     return login_view(form_data, db)
 
 @router.post("/register")
-async def register(form_data: Annotated[RequestUserCreate, Depends()], 
+async def register(form_data: RequestUserCreate = Body(...), 
                    db: Session = Depends(get_db)):
     register_view(form_data, db)
 

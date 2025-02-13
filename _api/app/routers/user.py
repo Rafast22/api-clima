@@ -1,6 +1,6 @@
-from fastapi import Depends, APIRouter, status
+from fastapi import Depends, APIRouter, status, Body
 from typing import Annotated
-from .._schemas.user import RequestUser
+from .._schemas.user import RequestUserResponse, RequestUserUpdate
 from .._view.user import (
     update_user as update_user_view,
     get_user_by_id as get_user_by_id_view,
@@ -13,22 +13,22 @@ from sqlalchemy.orm import Session
 router = APIRouter(prefix="/api/user", tags=["User"])
 
 @router.put("/", status_code=status.HTTP_204_NO_CONTENT)
-async def update_user(user: Annotated[RequestUser, Depends()], 
-                      is_autenticate: Annotated[bool, Depends(is_user_autenticate)], 
+async def update_user(is_autenticate: Annotated[bool, Depends(is_user_autenticate)], 
+                      user: RequestUserUpdate = Body(...), 
                       db: Session = Depends(get_db)):
     
     return update_user_view(db, user)
     
-@router.get("/{user_id}", response_model=RequestUser)
-async def get_user_by_id(user_id: int, 
-                         is_autenticate: Annotated[bool, Depends(is_user_autenticate)], 
+@router.get("/{user_id}", response_model=RequestUserResponse)
+async def get_user_by_id(is_autenticate: Annotated[bool, Depends(is_user_autenticate)], 
+                         user_id: int, 
                          db: Session = Depends(get_db)):
     
     return get_user_by_id_view(db, user_id)
 
 @router.delete("/{user_id}", status_code=status.HTTP_202_ACCEPTED)
-async def delete_user_by_id(user_id: int, 
-                            is_autenticate: Annotated[bool, Depends(is_user_autenticate)], 
+async def delete_user_by_id(is_autenticate: Annotated[bool, Depends(is_user_autenticate)], 
+                            user_id: int, 
                             db: Session = Depends(get_db)):
     
     delete_user_by_id_view(db, user_id)

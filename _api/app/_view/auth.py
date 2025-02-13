@@ -1,5 +1,5 @@
 from .._models.user import User
-from .._schemas.user import RequestUserCreate, RequestUser
+from .._schemas.user import RequestUserCreate
 from .._models import user
 from sqlalchemy.orm import Session
 from .._schemas.token import RequestToken, TokenData
@@ -103,7 +103,7 @@ def register(request_user:RequestUserCreate, db: Session):
 
 def login(form_data: OAuth2PasswordRequestForm, db: Session) -> RequestToken:
     user = authenticate_user(db, form_data.username, form_data.password)
-    if not user is User:
+    if not type(user) is User:
         raise HTTPException(status_code=httpStatus.HTTP_401_UNAUTHORIZED)
     
     access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)

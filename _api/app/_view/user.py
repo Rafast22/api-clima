@@ -1,26 +1,33 @@
 from .._models.user import User
 from .._models import user
-from .._schemas.user import RequestUser
+from .._schemas.user import RequestUserResponse, RequestUserUpdate
 from sqlalchemy.orm import Session
 from fastapi import HTTPException, status, Depends
 
 
-def update_user(db: Session , u: RequestUser) -> RequestUser:
+def update_user(db: Session , u: RequestUserUpdate) -> RequestUserUpdate:
 
     try:
-        db_user = user.get_user_by_email(db, u.email)
+        db_user = user.get_by_id(db, u.id)
         if not db_user:
-            raise HTTPException
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+        
+        if user.get_user_by_email(db, u.email):
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="{'error':'email already used'}")
+        if user.get_user_by_username(db, u.username):
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="{'error':'user already used'}")
+
+        
         u.password = User.get_password_hash(u.password)
         db_user = user.update(db, u)
     except HTTPException as ex:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
     except Exception as ex:
         raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=str(ex))
     
     return db_user
 
-def get_user_by_id(db: Session, user_id:int ) -> RequestUser:
+def get_user_by_id(db: Session, user_id:int ) -> RequestUserResponse:
     try:
         db_user = user.get_by_id(db, user_id)
     except Exception as ex:

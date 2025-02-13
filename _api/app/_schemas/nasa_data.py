@@ -1,9 +1,10 @@
 
 from pydantic import BaseModel
 from typing import Union, Optional
+from datetime import datetime
 
 class RequestDataBase(BaseModel):
-    date: str | None = None
+    date: datetime | None = None
     prectotcorr: float | None = None
     rh2m: float | None = None
     qv2m: float | None = None

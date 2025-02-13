@@ -51,11 +51,14 @@ class RequestUserBase(BaseModel):
 class RequestUserCreate(RequestUserBase):
     pass
 
-class RequestUser(RequestUserBase):
+class RequestUserUpdate(RequestUserBase):
     id: int 
-    last_login: datetime | None
-    date_joined: datetime | None
+    last_login: Union[datetime, None] = None
+    date_joined: Union[datetime, None] = None
+
+class RequestUserResponse(RequestUserUpdate):
     cultivos:list[RequestCultivo] = []
+
     
 
     

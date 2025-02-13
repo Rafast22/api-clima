@@ -1,23 +1,31 @@
-from sqlalchemy import Column, Integer, String, ForeignKey
-from sqlalchemy.orm import Session
+from sqlalchemy import Column, Integer, String, ForeignKey, LargeBinary
+from sqlalchemy.orm import Session, relationship
 from ..database import Base
-from .._schemas.localicad import RequestLocalidadCreate, RequestLocalidad
+from .._schemas.localidad import RequestLocalidadCreate, RequestLocalidad
 from fastapi import HTTPException, status
 
 class Localidad(Base):
     __tablename__ = "Localidad"
+
     def __init__(self, localidad: RequestLocalidadCreate):
         
         self.latitude = localidad.latitude
         self.longitude = localidad.longitude
         self.user_id = localidad.user_id
-        self.cultivo_id = localidad.cultivo_id
+        self.cultivo_id = localidad.cultivo_id if localidad.cultivo_id else None
+
     
     id = Column(Integer, primary_key=True, index=True)
     latitude = Column(String, index=True) 
     longitude = Column(String, index=True)
-    user_id = Column(Integer, ForeignKey('User.id'))
-    cultivo_id = Column(Integer, ForeignKey('Cultivos.id'), nullable=True)
+    user_id = Column(Integer, ForeignKey('User.id', ondelete="CASCADE"), nullable=False)
+    model_prectotcorr = Column(LargeBinary, nullable=True)
+    model_rh2m = Column(LargeBinary, nullable=True)
+    model_qv2m = Column(LargeBinary, nullable=True)
+    model_t2m = Column(LargeBinary, nullable=True)
+    model_ws2m = Column(LargeBinary, nullable=True)
+    predictions = relationship("Predictions", cascade="all, delete-orphan", passive_deletes=True)
+    
    
     
 
@@ -37,6 +45,11 @@ def create(db: Session, localidad: RequestLocalidadCreate):
     db.refresh(db_localidad)
     return db_localidad
 
+def update_entity(db: Session, localidad:Localidad):
+    
+    db.add(localidad)
+    db.commit()
+   
 
 def update(db: Session, localidad: RequestLocalidad):
     db_localidad = db.get(Localidad, localidad.id)
