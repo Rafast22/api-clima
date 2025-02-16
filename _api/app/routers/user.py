@@ -1,5 +1,5 @@
 from fastapi import Depends, APIRouter, status, Body
-from typing import Annotated
+from typing import Annotated, Union
 from .._schemas.user import RequestUserResponse, RequestUserUpdate
 from .._view.user import (
     update_user as update_user_view,
@@ -7,7 +7,7 @@ from .._view.user import (
     delete_user_by_id as delete_user_by_id_view
 )
 from ..database import get_db
-from .._view.auth import is_user_autenticate
+from .._view.auth.auth import is_user_autenticate
 from sqlalchemy.orm import Session
 
 router = APIRouter(prefix="/api/user", tags=["User"])

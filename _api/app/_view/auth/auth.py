@@ -1,17 +1,18 @@
-from .._models.user import User
-from .._schemas.user import RequestUserCreate
-from .._models import user
+
 from sqlalchemy.orm import Session
-from .._schemas.token import RequestToken, TokenData
 from fastapi import HTTPException, status as httpStatus, Depends
 from datetime import datetime, timedelta, timezone
 from typing import Annotated, Union
-import jwt
 from passlib.exc import UnknownHashError
-from ..database import SECRET_KEY, ALGORITHM, ACCESS_TOKEN_EXPIRE_MINUTES, get_db, oauth2_scheme
-from jwt.exceptions import InvalidTokenError
 from fastapi.security import OAuth2PasswordRequestForm
-
+from ..._schemas.token import RequestToken, TokenData
+from ..._models.user import User
+from ..._schemas.user import RequestUserCreate
+from ..._models import user
+from ...database import SECRET_KEY, ALGORITHM, ACCESS_TOKEN_EXPIRE_MINUTES, get_db, oauth2_scheme, oauth2_scheme_google
+from jwt.exceptions import InvalidTokenError
+import jwt
+from .oauth2_google import verify_google_token
 async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]):
 
     try:
@@ -59,16 +60,37 @@ def authenticate_user(db: Session, username: str, password: str):
     except UnknownHashError:
       raise HTTPException(status_code=httpStatus.HTTP_500_INTERNAL_SERVER_ERROR)
    
-async def is_user_autenticate(token: Annotated[str, Depends(oauth2_scheme)]):
+async def is_user_autenticate(token: str = Depends(oauth2_scheme), google_token: str = Depends(oauth2_scheme_google)):
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         username: str = payload.get("sub")
         if not username:
             raise HTTPException(status_code=httpStatus.HTTP_401_UNAUTHORIZED)
-
-    except InvalidTokenError:
+        return True
+    except HTTPException:
         raise HTTPException(status_code=httpStatus.HTTP_401_UNAUTHORIZED)
-    return True
+    except InvalidTokenError as ex:
+        pass
+    
+    try:
+        payload = jwt.decode(google_token, SECRET_KEY, algorithms=[ALGORITHM])
+        ob: dict = payload.get("sub")
+        response = await verify_google_token(google_token)
+        
+        return True
+    except HTTPException:
+        raise HTTPException(status_code=httpStatus.HTTP_401_UNAUTHORIZED)
+
+def decode_jwt(token: str):
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        return payload
+    except InvalidTokenError:
+        raise HTTPException(
+            status_code=httpStatus.HTTP_401_UNAUTHORIZED,
+            detail="Token inválido ou expirado",
+        )
+
 
 async def get_current_user(db: Session, token: Annotated[str, Depends(oauth2_scheme)]):
     try:
@@ -109,10 +131,3 @@ def login(form_data: OAuth2PasswordRequestForm, db: Session) -> RequestToken:
     access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     access_token = create_access_token(data={"sub": user.username}, expires_delta=access_token_expires)
     return RequestToken(access_token=access_token, token_type="bearer")
-
-def logout(current_user:User = Depends(oauth2_scheme), db: Session = Depends(get_db)):
-    pass
-
-def status():
-    return {"logged": True}
-    

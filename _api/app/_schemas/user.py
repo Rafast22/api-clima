@@ -41,7 +41,7 @@ class RequestUserBase(BaseModel):
     username: str
     password: str
     full_name: str
-    email: Union[EmailStr, None] = Field(default=None)
+    email: Union[EmailStr, None] = None
     is_staff: Union[bool, None] = False
     is_active: Union[bool, None] = True
     role: Union[str, None] = "user"

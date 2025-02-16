@@ -17,7 +17,9 @@
                 "--host",
                 "0.0.0.0"
             ],
-            "jinja": true
+            "jinja": true,
+            // Add env file for database env variables
+            "envFile": "${workspaceFolder}/.environment"
         }
     ]
 }

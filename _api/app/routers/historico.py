@@ -4,7 +4,7 @@ from .._schemas.user import RequestUserCreate
 from .._models.user import User
 from .._view import historico
 from ..database import get_db
-from .._view.auth import is_user_autenticate
+from .._view.auth.auth import is_user_autenticate
 from sqlalchemy.orm import Session
 router = APIRouter()
 

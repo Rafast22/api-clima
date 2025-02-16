@@ -25,15 +25,9 @@ services:
     command: uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
     ports:
       - "8000:8000"
-    environment:
-      DATABASE_URL: postgresql://postgres:Rei12Rom%40@postgres:5432/DB
-      SECRET_KEY: 8b5a1650bd34eda3385b11cc27ba36e783ec966e3cb5ca38e96bad77d417569cc33c9d2be10f470b32b277067623ccbe577f00228710bbbe3744197d4f92
-      ALGORITHM: HS256 
-      ACCESS_TOKEN_EXPIRE_MINUTES: 30
-      SENDER_EMAIL: teste
-      SMTP_PASSWORD: test
-      SMTP_SERVER: test30
-      SMTP_PORT: 8080
+    env_file: ".environment"
+      
+
 
 volumes:
   postgres_data:

@@ -10,7 +10,7 @@ from .._view.localidad import (
     create_localidad as create_localidad_view
 )
 from ..database import get_db
-from .._view.auth import is_user_autenticate
+from .._view.auth.auth import is_user_autenticate
 from sqlalchemy.orm import Session
 
 

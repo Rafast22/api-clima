@@ -7,7 +7,7 @@ from .._view.previcion import (get_previcion_by_day as get_previcion_by_day_view
                                get_previcion_periodo as get_previcion_periodo_view,
                             ) 
 from ..database import get_db
-from .._view.auth import is_user_autenticate
+from .._view.auth.auth import is_user_autenticate
 from sqlalchemy.orm import Session
 from datetime import date, datetime, timedelta
 

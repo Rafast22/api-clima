@@ -9,7 +9,7 @@ from .._view.cultivo import (
     create_cultivo as create_cultivo_view
 )
 from ..database import get_db
-from .._view.auth import is_user_autenticate
+from .._view.auth.auth import is_user_autenticate
 from sqlalchemy.orm import Session
 
 
