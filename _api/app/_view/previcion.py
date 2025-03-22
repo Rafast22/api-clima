@@ -1,4 +1,4 @@
-from datetime import datetime, date
+from datetime import datetime, date, timedelta
 from collections import defaultdict
 from typing import List
 from .._models.predictions import Predictions
@@ -31,13 +31,11 @@ def get_previcion(db: Session, fecha_inicial:date, fecha_final:date ,tipo, culti
 
     return result
 
-def get_previcion_by_day(db: Session, day:str, tipo, cultivo):
-    d = "".join("".join(day.split('-')).split("T")[0])
+def get_previcion_by_day(db: Session, d:datetime):
+    first_date = datetime(d.year, d.month, d.day)
+    last_date = first_date + timedelta(hours=23)
 
-    db_predictions = predictions.get_previcion_by_day(db,  day)
-    if not db_predictions:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
-    
+    db_predictions = predictions.get_previcion_by_day(db,  first_date, last_date)
 
     result = defaultdict(list)  
 
@@ -46,24 +44,59 @@ def get_previcion_by_day(db: Session, day:str, tipo, cultivo):
             if not callable(attribute_value) and not attribute_name.startswith('_'):
                 if attribute_name == "date":
                     formato = "%Y%m%d%H"
-                    data = datetime.strptime(attribute_value, formato)
+                    data = attribute_value
                     result[attribute_name].append(data)
                 else:
                     result[attribute_name].append(attribute_value)
     result["dia_optimo"] = list
-    for k in range(0, len(result["id"])-1):
-       result["dia_optimo"].append(get_valores_por_tipo_parametro_cosecha(result["prectotcorr"][k], result["ws2m"][k], result["rh2m"][k], result["t2m"][k], result["qv2m"][k], tipo, cultivo))
+    # for k in range(0, len(result["id"])-1):
+    #    result["dia_optimo"].append(get_valores_por_tipo_parametro_cosecha(result["prectotcorr"][k], result["ws2m"][k], result["rh2m"][k], result["t2m"][k], result["qv2m"][k], tipo, cultivo))
 
-    return result
+    # return result
+    return db_predictions
 
-def get_previcion_semana(db: Session, localidad:int, day:datetime,):
+def get_previcion_total_from_today(db: Session, tipo:int, cultivo:int, localidad:int):
+    today = datetime.now()
+    fist_date = today.replace(day=1)
 
-    # str_day= day.strftime('%Y%m%d')+"00"
-    # db_predictions = predictions.get_previcion_semana(db,  str_day)
-    try:
-        db_predictions = predictions.get_previcion_semana(db, localidad, day)
-    except Exception as ex:
-        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail=f"{str(ex)}")
+    db_predictions = predictions.get_previcion_by_day(db, fist_date, tipo, cultivo, localidad)
+
+    # result = defaultdict(list)  
+
+    # for obj in db_predictions:
+    #     for attribute_name, attribute_value in obj.__dict__.items():
+    #         if not callable(attribute_value) and not attribute_name.startswith('_'):
+    #             if attribute_name == "date":
+    #                 formato = "%Y%m%d%H"
+    #                 data = datetime.strptime(attribute_value, formato)
+    #                 result[attribute_name].append(data)
+    #             else:
+    #                 result[attribute_name].append(attribute_value)
+    # result["dia_optimo"] = list
+    # for k in range(0, len(result["id"])-1):
+    #    result["dia_optimo"].append(get_valores_por_tipo_parametro_cosecha(result["prectotcorr"][k], result["ws2m"][k], result["rh2m"][k], result["t2m"][k], result["qv2m"][k], tipo, cultivo))
+
+    # return result
+    return db_predictions
+
+
+def get_previcion_semana(db: Session, localidad:int):
+
+    db_predictions = predictions.get_previcion_semana(db, localidad)
+    data = [r.__dict__ for r in db_predictions]
+    new_data = [{k: v for k, v in d.items() if k != 'id' and k != '_sa_instance_state'} for d in data]
+    del data
+    del db_predictions
+
+    return new_data
+
+def get_previcion_semana_by_data(db: Session, localidad:int, data_inicial:datetime, data_final:datetime):
+
+    if data_final > data_inicial:
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f" the date {str(data_final)} is greater than the date {str(data_inicial)}")
+
+
+    db_predictions = predictions.get_previcion_semana_by_data(db, localidad, data_inicial, data_final)
 
     data = [r.__dict__ for r in db_predictions]
     # return pd.DataFrame.from_records(data)
@@ -81,6 +114,7 @@ def get_previcion_semana(db: Session, localidad:int, day:datetime,):
     # return mean.to_dict()
     return new_data
 
+
 def get_previcion_periodo(db: Session, data_inicio:datetime, data_fin:datetime, tipo:int, cultivo:int, localidad:int):
     try:
         db_predictions = predictions.get_previcion_periodo(db,  data_inicio, data_fin, localidad)
@@ -91,8 +125,8 @@ def get_previcion_periodo(db: Session, data_inicio:datetime, data_fin:datetime, 
     new_data = [{k: v for k, v in d.items() if k != 'id' and k != '_sa_instance_state'} for d in data]
     del data
     del db_predictions
-
-    return predict.classify_day_type(new_data)
+    return new_data
+    #return predict.classify_day_type(new_data)
     # return new_data
 
 def get_valores_por_tipo_parametro_cosecha(prectotcorr, ws2m, rh2m, t2m, qv2m, tipo, cultivo)->bool:

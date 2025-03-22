@@ -13,17 +13,22 @@
     display: grid;
     grid-template-columns: repeat(7, 1fr);
     margin-top: 10px;
+    min-width: 7fr;
+
 }
 
 .day {
     font-weight: bold;
     text-align: center;
+    user-select: none;
+    /* pointer-events: none; */
 }
 
 .dates {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
     margin-top: 10px;
+    user-select: none;
 }
 
 .date {
@@ -65,7 +70,9 @@
     margin-right: 10px;
     cursor: pointer; 
     transition: transform 0.2s ease;
-    padding: 5px
+    padding: 5px;
+    user-select: none;
+    min-width: 7fr;
 }
 
   
@@ -74,7 +81,8 @@
     margin-left: 10px;
     margin-right: 10px;
     transform: scale(1.1); 
-    padding: 5px
+    padding: 5px;
+    user-select: none;
     
   }
   
@@ -86,7 +94,7 @@
     padding: 5px;
     background-color: #24a0ed;
     border-radius: 5px;
-
+    user-select: none;
     
   }
 

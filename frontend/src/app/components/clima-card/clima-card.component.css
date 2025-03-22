@@ -28,6 +28,10 @@
 .container::-webkit-scrollbar-thumb:hover {
     background: #555; /* Cor do "thumb" ao passar o mouse */
 }
+.lateral-buttons{
+    cursor: pointer;
+}
+
 .weather-card {
     background-color: white;
     border-radius: 10px;
@@ -44,7 +48,7 @@
 }
 .weather-card {
     width: 108px;
-    height: 248px;
+    height: 200px;
 }
 .scroll-button {
     position: absolute;

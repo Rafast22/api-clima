@@ -66,10 +66,25 @@ def create_bulk(db: Session, datas: list[RequestDataCreate], localidad_id:int):
     if not isinstance(datas, list):
         raise HTTPException(status_code=400, detail="Os dados devem ser uma lista")
 
-    for Data in lista_de_objetos:    
-        db_data = Predictions(Data)
-        db_data.localidad_id = localidad_id
-        db.add(db_data)
+    for data in lista_de_objetos:
+            existing_record = (db.query(Predictions).filter(Predictions.date == data.date).first())
+
+            if existing_record:
+                [setattr(existing_record, key, value) for key, value in vars(data).items() ]
+                db.add(existing_record)
+
+            else:
+                new_record = Predictions(data)
+                new_record.localidad_id = localidad_id
+                db.add(new_record)
+
+
+    db.commit()
+
+def delete_bulk_by_date(db: Session, first_date: datetime, last_date:datetime):
+
+    db.query(Predictions).filter(Predictions.date.between(first_date, last_date)
+                                 ).delete(synchronize_session=False)
     db.commit()
 
 def get_previcion(db: Session, fecha_inicial:datetime, fecha_final:datetime):
@@ -79,19 +94,50 @@ def get_previcion(db: Session, fecha_inicial:datetime, fecha_final:datetime):
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Predictions not found")
     return db_data
 
-def get_previcion_by_day(db: Session, day:str):
-    db_data = db.query(Predictions).filter(
-        func.lower(Predictions.date).startswith(day)  # Filtra pelo nome começando com "maria"
-    ).all()
+def get_previcion_by_day(db: Session, first_date:datetime, last_date:datetime):
+    # db_data = db.query(Predictions).filter(
+    #     func.lower(Predictions.date).startswith(day)
+    # ).all()
 
-    if not db_data:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Predictions not found")
+    db_data = db.query(Predictions
+                       ).options(load_only(Predictions.id, 
+                       Predictions.date, 
+                       Predictions.prectotcorr, 
+                       Predictions.rh2m, 
+                       Predictions.qv2m, 
+                       Predictions.t2m, 
+                       Predictions.ws2m
+                        )).filter(Predictions.date.between(first_date, last_date)).all()
+                        # )).filter(Predictions.date == day).all()
+
     return db_data
 
-def get_previcion_semana(db: Session, localidad:int, day:datetime):
+def get_previcion_total_from_today(db: Session, day:datetime, tipo:int, cultivo:int, localidad:int):
+    db_data = db.query(Predictions
+                       ).options(load_only(Predictions.id, 
+                       Predictions.date, 
+                       Predictions.prectotcorr, 
+                       Predictions.rh2m, 
+                       Predictions.qv2m, 
+                       Predictions.t2m, 
+                       Predictions.ws2m
+                        # )).filter(Predictions.date.between(day, dt_final)).all()
+                        )).filter(and_(Predictions.date > day, Predictions.tipo == tipo, 
+                                       Predictions.cultivo == cultivo, 
+                                       Predictions.localidad_id == localidad )).all()
+
+    return db_data
+
+
+def get_previcion_semana(db: Session, localidad:int):
     # dt_inicio = datetime.strptime(day, '%Y%m%d%H')
     # dt_final = dt_inicio + timedelta(days=6, hours=23)
-    dt_final = day + timedelta(days=6, hours=23, minutes=59, milliseconds=59)
+    d = datetime.now()
+    day = datetime(d.year, d.month, d.day)
+    # dia_da_semana = day.weekday()
+    # primeira_dia = day - timedelta(days=(dia_da_semana + 1) % 7, hours=0, minutes=0, milliseconds=0)
+    # dt_final = primeira_dia + timedelta(days=5, hours=23, minutes=59, milliseconds=59)
+    dt_final = day + timedelta(days=7, hours=23, minutes=59, milliseconds=59)
 
     db_data = db.query(Predictions
                        ).options(load_only(Predictions.id, 
@@ -105,6 +151,23 @@ def get_previcion_semana(db: Session, localidad:int, day:datetime):
                         )).filter(and_(Predictions.date.between(day, dt_final), 
                                         Predictions.localidad_id == localidad)).all()
     return db_data
+
+def get_previcion_semana_by_data(db: Session, localidad:int, data_inicial:datetime, data_final:datetime):
+
+
+    db_data = db.query(Predictions
+                       ).options(load_only(Predictions.id, 
+                       Predictions.date, 
+                       Predictions.prectotcorr, 
+                       Predictions.rh2m, 
+                       Predictions.qv2m, 
+                       Predictions.t2m, 
+                       Predictions.ws2m
+                        # )).filter(Predictions.date.between(day, dt_final)).all()
+                        )).filter(and_(Predictions.date.between(data_inicial, data_final), 
+                                        Predictions.localidad_id == localidad)).all()
+    return db_data
+
 
 def get_previcion_periodo(db: Session, data_inicio:datetime, data_fin:datetime, localidad:int):
 

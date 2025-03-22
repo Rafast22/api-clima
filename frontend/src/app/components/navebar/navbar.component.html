@@ -1,12 +1,12 @@
-<mat-toolbar color="" class="mat-elevation-z8 tema-dark">
-    @if(!isMobile){
+@if(this.auth.checkAuthStatus()){
+    <mat-toolbar color="" class="mat-elevation-z8 tema-dark">
         <button (click)="drawer.toggle()" mat-icon-button>
             <mat-icon>menu</mat-icon>
         </button>
-}
+    
     <span>Prediccion Climatica (IA)</span> 
     <span class="example-spacer"></span>
-
+    
     <!-- <mat-menu #siembra="matMenu">
         <button mat-menu-item>Term</button>
         <button mat-menu-item>Tax</button>
@@ -20,19 +20,19 @@
         <button mat-menu-item>Color</button>
         <button mat-menu-item>Size</button>
     </mat-menu>
-    <button (click)="badgevisibility()"  mat-icon-button>
+    <!-- <button (click)="badgevisibility()"  mat-icon-button>
         <mat-icon matBadgeColor="accent" matBadge="15" [matBadgeHidden]="badgevisible" matBadgeSize="small">notifications</mat-icon>
-    </button>
-</mat-toolbar>
-@if(!isMobile){
+    </button> -->
+    </mat-toolbar>
+    
     <mat-drawer-container autosize>
         <mat-drawer #drawer opened="true" mode="side" position="start" class="dark">
         <mat-nav-list>
-            <mat-list-item>
-                <button routerLink="recomendaciones" mat-button style="color:#F8F8F2;"><mat-icon>dashboard</mat-icon>Menu</button>
+            <mat-list-item routerLink="recomendaciones">
+                <button  mat-button style="color:#F8F8F2;"><mat-icon>cloud</mat-icon>Recomendaciones</button>
             </mat-list-item>
-            <mat-list-item>
-                <button routerLink="" mat-button style="color:#F8F8F2"><mat-icon>cloud</mat-icon> Clima</button>
+            <mat-list-item (click)="openModalHistory()">
+                <button  mat-button style="color:#F8F8F2"><mat-icon>history</mat-icon>Histórico</button>
             </mat-list-item>
             <!-- <mat-list-item>
                 <button mat-button [matMenuTriggerFor]="cultivo" style="color: #F8F8F2;"><mat-icon>add</mat-icon> Registrar Cultivo</button>
@@ -42,12 +42,14 @@
                     <button mat-menu-item>Siembra</button>
                 </mat-menu>
             </mat-list-item> -->
-            <mat-list-item>
-                <button mat-button style="color: #F8F8F2;"><mat-icon>settings</mat-icon> Configuracion</button>
+            <mat-list-item (click)="openModalSettings()">
+                <button mat-button routerLink="" style="color: #F8F8F2;"><mat-icon>settings</mat-icon>Configuración</button>
             </mat-list-item>
-            <mat-list-item>
-                <button mat-button style="color: #F8F8F2;"><mat-icon>help</mat-icon> Ayuda</button>
+    
+            <mat-list-item  (click)="logout()">
+                <button mat-button style="color: #F8F8F2;" ><mat-icon>logout</mat-icon>Salir</button>
             </mat-list-item>
+            
         </mat-nav-list>
     
         </mat-drawer>
@@ -56,24 +58,30 @@
           </mat-drawer-content>
     </mat-drawer-container>
 }
-@else if(isMobile){
-    <mat-tab-group headerPosition="below" dynamicHeight >
-        <mat-tab label="First">
-            <ng-template mat-tab-label>
-                <mat-icon class="example-tab-icon">thumb_up</mat-icon>
-            </ng-template>
-            <div class="overflow">
-                <div style="text-align: center;min-height: 600px;">
-                    <div #container></div>
-                </div>
-            </div>
-        </mat-tab>
-        <mat-tab label="Second">
-            <ng-template mat-tab-label>
-                <mat-icon class="example-tab-icon">thumb_down</mat-icon>
-            </ng-template>
-            test
-        </mat-tab>
-
-    </mat-tab-group>
+@else{
+    <router-outlet></router-outlet>
 }
+<!-- 
+<mat-tab-group headerPosition="below" dynamicHeight >
+    <mat-tab label="First">
+        <ng-template mat-tab-label>
+            <a href=""></a>
+            <mat-icon class="example-tab-icon" >thumb_up</mat-icon>
+        </ng-template>
+        <ng-template matTabContent>
+            <div class="overflow">
+                <router-outlet></router-outlet>
+            </div>
+        </ng-template>
+        
+    </mat-tab>
+    <mat-tab label="Second">
+        <ng-template mat-tab-label>
+            <mat-icon class="example-tab-icon">thumb_down</mat-icon>
+        </ng-template>
+        test
+    </mat-tab>
+
+</mat-tab-group> -->
+
+<label style="display: none;">{{isMobile}}</label>

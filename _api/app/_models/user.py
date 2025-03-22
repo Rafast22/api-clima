@@ -2,7 +2,7 @@ from sqlalchemy import Column, Integer, String, Boolean, DateTime, or_
 from sqlalchemy.sql import func
 from ..database import pwd_context, Base
 from .._schemas.user import RequestUserCreate, RequestUserUpdate
-from sqlalchemy.orm import Session, relationship
+from sqlalchemy.orm import Session, relationship, load_only
 from fastapi import HTTPException, status
 
 
@@ -50,17 +50,23 @@ def get_by_id(db: Session, user_id: int):
     return db.get(User, user_id)
 
 def get_user_by_email(db: Session, q: str):
-    return db.query(User).filter(User.email == q).first()
+    return db.query(User).options(load_only(User.id,
+                                            User.username,
+                                            User.email,
+                                            User.full_name,
+                                            User.password)).filter(User.email == q).first()
 
 
 def get_user_by_username(db: Session, username: str):
-    return db.query(User).filter(User.username == username).first()
+    return db.query(User).options(load_only(User.id,
+                                            User.username,
+                                            User.email,
+                                            User.full_name,
+                                            User.password)).filter(User.username == username).first()
 
-def get_user( db:Session, email: str=None, username: str = None):
+def get_user( db:Session, email: str=None):
     if email:
         return get_user_by_email(db, email)
-    elif username:
-        return get_user_by_username(db, username)
 
 def create(db: Session, user: RequestUserCreate):
     db_user = User(user)

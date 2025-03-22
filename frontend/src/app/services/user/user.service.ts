@@ -1,146 +1,43 @@
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders, HttpParams } from "@angular/common/http";
-import { User } from './user';
-import { BehaviorSubject } from 'rxjs';
-
+import { User } from '../../models/user';
+import { BaseService } from '../base.service';
 
 @Injectable({
-  providedIn: 'root',
+  providedIn: 'root'
 })
-export class UserService {
-  
-  tokenKey:string = 'token';
-  private headers:HttpHeaders
-  private baseUrl = 'http://127.0.0.1:8000/api'
-  isLoggedInSubject = new BehaviorSubject<boolean>(false);
+export class UserService extends BaseService<User, number> {
+  constructor(http: HttpClient) {
+    super(http)
+    this.headers = new HttpHeaders;
+  }
 
-  constructor(private http: HttpClient) {
-    this.headers = new HttpHeaders({
-      'accept': "application/json",
-      'Content-Type': 'application/x-www-form-urlencoded'  
-    });
-   }
-
-
-   getAuthenticatedHeaders(): HttpHeaders {
-    const token = this.getToken();
-    if (token) {
-      return new HttpHeaders({
-        'Authorization': `Bearer ${token}`,
-        'Accept': 'application/json'
+  public async updateUser(usuario: User) {
+    this.headers = new HttpHeaders({ 'accept': "application/json" });
+    return await this.http.put<any>(`${this.baseUrl}`, usuario, { headers: this.headers }).toPromise().then()
+      .catch(ex => {
+        console.log(ex);
       });
-    }
-    return new HttpHeaders({
-      'Accept': 'application/json'
-    });
-  }
-  setToken(token?: string | undefined){
-    // First, serialize it (but just if token is not string type).
-    if(!token) return;
-    // const tokenString:string = JSON.stringify( token );
-    localStorage.setItem(this.tokenKey, token);
-  }
-  getToken(): string{
-    const token_string = localStorage.getItem( this.tokenKey ) ?? "";
-    let token:string = "";
-    if( token_string !=null){
-      token = token_string;
-    }
-    return token;
   }
 
-  logoutUser() {
-    localStorage.removeItem(this.tokenKey)
-  }
-
-  public async cadastrar(usuario: User) {
-    this.headers =  new HttpHeaders({
-      'accept': "application/json",
-      'Content-Type': 'application/json'  
-    })
-    return await this.http.post<any>(`${this.baseUrl}/register`, usuario, { headers:this.headers }).toPromise().then(r => {
-      const a = {Ok: true}
-      return a
-    })
-    .catch(err => {
-      const r:any = {};
-      r.Ok = false;
-      r.error = this.tratarRespostaDeCdasto(err.error.detail);
-      return r;
-    })
-  }
-
-  tratarRespostaDeCdasto(err:string){
-    if(err.toLowerCase().includes("username") ){
-      return "El email ya esta registrado"
-    }
-    else if(err.toLowerCase().includes("email")){}
-    return ''
-  }
-
-  public async login(usuario: User):Promise<boolean> {
-    let ret:boolean=false
-    const body = new HttpParams()
-      .set('grant_type', 'password')
-      .set('username', usuario.email ?? "")
-      .set('password', usuario.password ?? "") 
-      .set('client_id', 'string') 
-      .set('client_secret', 'string'); 
-      await this.http.post<Token>(`${this.baseUrl}/login`, body.toString(), { headers:this.headers }).toPromise().then(r =>{
-        if(r){
-          this.setToken(r.access_token)
-          ret = true;
-          localStorage.setItem('isLoggedIn', 'true');
-          return;
-        }
-        ret = false;
-      })
-      .catch(error => {
-        console.log(error)
+  public async getUser(user_id: number) {
+    this.headers = new HttpHeaders({ 'accept': "application/json" });
+    return await this.http.get<User>(`${this.baseUrl}/`, { headers: this.headers }).toPromise().then()
+      .catch(ex => {
+        console.log(ex);
       });
-    return ret
-  }
-  
-  public async EditarUsuario(usuario: User) {
-    const body = this.getAuthenticatedHeaders()
-      .set('Content-Type', 'application/json')
-      .set('accept', 'application/json');
-    return await this.http.put<any>(`${this.baseUrl}/user`, usuario, { headers:this.headers }).toPromise().then();
   }
 
-  async checkAuthStatus():Promise<boolean> {
-    const body = this.getAuthenticatedHeaders()
-    .set('Content-Type', 'application/json')
-    .set('accept', 'application/json');
-    return new Promise<boolean>((resolve) => {
-      this.http.get<any>(`${this.baseUrl}/status`, { headers: this.headers }).subscribe(
-        (r) => {
-          if (r['logged'] === true) {
-            resolve(true);
-          } else {
-            this.logoutUser();
-            resolve(false);
-          }
-        },
-        (error) => {
-          if (error.status = 401){
-            console.error('Error checking authentication status:', error);
-            resolve(false); 
-            return;
-          }
-          
-          
-        }
-      );
-    });
+  public async deleteUser(user_id: number) {
+    this.headers = new HttpHeaders({ 'accept': "application/json" });
+    return await this.http.delete(`${this.baseUrl}/`, { headers: this.headers }).toPromise().then()
+      .catch(ex => {
+        console.log(ex);
+      });
   }
 
+  protected getEndpoint(): string {
+    return 'user';
+  }
 
- 
 }
-
-interface Token{
-  access_token:string;
-  token_type:string;
-}
-

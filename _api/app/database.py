@@ -3,6 +3,7 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from fastapi.security import OAuth2PasswordBearer, OAuth2AuthorizationCodeBearer
 from passlib.context import CryptContext
+import time
 import os
 import sys
 
@@ -24,10 +25,23 @@ GOOGLE_CLIENT_ID = os.getenv('GOOGLE_CLIENT_ID')
 GOOGLE_CLIENT_SECRET = os.getenv('GOOGLE_CLIENT_SECRET')
 GOOGLE_REDIRECT_URI_HML = os.getenv('GOOGLE_REDIRECT_URI_HML')
 SECRET_KEY = os.getenv('SECRET_KEY')
-
-engine = create_engine(DATABASE_URL)
+print(DATABASE_URL)
+print(SENDER_EMAIL)
+print(SMTP_PASSWORD)
+print(SMTP_SERVER)
+print(SMTP_PORT)
+print(ALGORITHM)
+print(ACCESS_TOKEN_EXPIRE_MINUTES)
+print(GOOGLE_CLIENT_ID)
+print(GOOGLE_CLIENT_SECRET)
+print(GOOGLE_REDIRECT_URI_HML)
+print(SECRET_KEY)
 
 if not IS_DOCKER:
+    if not DATABASE_URL:
+        DATABASE_URL = SQLITE_URL
+    else:
+        DATABASE_URL = 'postgresql://postgres:Rei12Rom%40@localhost:5432/DB'
     if gettrace():
         SECRET_KEY = 'test'
         ACCESS_TOKEN_EXPIRE_MINUTES = 1000
@@ -38,6 +52,10 @@ if not IS_DOCKER:
         SECRET_KEY = "test"
         ACCESS_TOKEN_EXPIRE_MINUTES = 1000
         ALGORITHM = 'HS256'
+else:
+    print(IS_DOCKER)
+    time.sleep(5)
+    engine = create_engine(DATABASE_URL)
 
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="api/auth/login")

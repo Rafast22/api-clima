@@ -52,3 +52,5 @@ _api/.environment
 _api/app/_view/auth/example.md
 _api/app/_view/auth/__pycache__/auth.cpython-311.pyc
 _api/app/_view/auth/__pycache__/oauth2_google.cpython-311.pyc
+_api/sql_app.db
+_api/app/_view/auth/__pycache__/*

@@ -19,7 +19,7 @@ async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]):
         payload = jwt.decode(token, str(SECRET_KEY), algorithms=[ALGORITHM])
         username: str = payload.get("sub")
         if not username:
-            raise HTTPException(status_code=httpStatus.HTTP_404_NOT_FOUND)
+            raise HTTPException(status_code=httpStatus.HTTP_400_BAD_REQUEST, detail="Inappropriate use of Authorization")
         token_data = TokenData(username=username)
         db_user = await user.get_user(email=token_data.email)
 
@@ -29,7 +29,7 @@ async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]):
         raise HTTPException(status_code=httpStatus.HTTP_500_INTERNAL_SERVER_ERROR)
 
     if db_user is None:
-        raise HTTPException(status_code=httpStatus.HTTP_404_NOT_FOUND)
+        raise HTTPException(status_code=httpStatus.HTTP_404_NOT_FOUND, detail="User not found")
     
     return user
 
@@ -53,7 +53,7 @@ def authenticate_user(db: Session, username: str, password: str):
             raise HTTPException(status_code=httpStatus.HTTP_400_BAD_REQUEST)
         
         if not user_db:
-            raise HTTPException(status_code=httpStatus.HTTP_404_NOT_FOUND)
+            raise HTTPException(status_code=httpStatus.HTTP_404_NOT_FOUND, detail="User not found")
         if not user_db.verify_password(password):
             raise HTTPException(status_code=httpStatus.HTTP_401_UNAUTHORIZED)
         return user_db
@@ -98,36 +98,34 @@ async def get_current_user(db: Session, token: Annotated[str, Depends(oauth2_sch
         username: str = payload.get("sub")
         if username is None:
             raise HTTPException(status_code=httpStatus.HTTP_401_UNAUTHORIZED)
-        token_data = TokenData(username=username)
-        db_user = user.get_user_by_username(db, username=token_data.username)
+        # token_data = TokenData(username=username)
+        db_user = user.get_user_by_username(db, username=username)
 
     except InvalidTokenError:
         raise HTTPException(status_code=httpStatus.HTTP_401_UNAUTHORIZED)
     
     if not db_user:
-        raise HTTPException(status_code=httpStatus.HTTP_404_NOT_FOUND)
+        raise HTTPException(status_code=httpStatus.HTTP_404_NOT_FOUND, detail="User not found")
 
     return db_user
 
 def register(request_user:RequestUserCreate, db: Session):
-    try:
-        user_db = user.get_user(db, username=request_user.username)
-        if user_db:
-            raise HTTPException(status_code=httpStatus.HTTP_400_BAD_REQUEST, detail="Username already registered")
-        else:
-            user_db = user.get_user(db, email=request_user.email)
-            if user_db:
-                raise HTTPException(status_code=httpStatus.HTTP_400_BAD_REQUEST, detail="Email already registered")
-        user.create(db, request_user)
-    except:
-        raise HTTPException(status_code=httpStatus.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    user_db = user.get_user(db, email=request_user.email)
+    if user_db:
+        raise HTTPException(status_code=httpStatus.HTTP_400_BAD_REQUEST, detail="Email already registered")
+    user.create(db, request_user)
 
 
 def login(form_data: OAuth2PasswordRequestForm, db: Session) -> RequestToken:
     user = authenticate_user(db, form_data.username, form_data.password)
-    if not type(user) is User:
+    if not isinstance(user, User):
         raise HTTPException(status_code=httpStatus.HTTP_401_UNAUTHORIZED)
-    
-    access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    if  isinstance(ACCESS_TOKEN_EXPIRE_MINUTES, str):
+        access_token_expires = timedelta(minutes=int(ACCESS_TOKEN_EXPIRE_MINUTES))
+    else:
+        access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+
+
     access_token = create_access_token(data={"sub": user.username}, expires_delta=access_token_expires)
     return RequestToken(access_token=access_token, token_type="bearer")

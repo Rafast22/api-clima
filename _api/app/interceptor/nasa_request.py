@@ -8,14 +8,35 @@ from datetime import datetime
 from typing import List
 from sqlalchemy.orm import Session
 import asyncio
-from datetime import datetime
-# from pandas.errors import 
+from datetime import datetime, timedelta
 
 semaphore = asyncio.Semaphore(1)  
 
 async def get_history_date(latitude: str, longitude: str):
-    today = datetime.now()
-    json_string = await get_formated_dict('20100101', '20240101',latitude, longitude)    
+    last_date = datetime.now()
+    while True:
+        r = await get_formated_dict(last_date.strftime("%Y%m%d"), last_date.strftime("%Y%m%d"), latitude, longitude)
+        if len(r) == 0 or True in [any(value == -999.0 for value in obj.values()) for obj in r] :
+            last_date = datetime(last_date.year, last_date.month-1, 1)
+        else:
+            del r
+            break
+    json_string = await get_formated_dict('20100101', last_date.strftime("%Y%m%d"),
+                                          latitude, longitude)    
+    return json_string
+
+async def get_new_history_date(latitude: str, longitude: str, first_date: datetime):
+    last_date = datetime.now()
+    while True:
+        r = await get_formated_dict(last_date.strftime("%Y%m%d"), last_date.strftime("%Y%m%d"), latitude, longitude)
+        if len(r) == 0 or True in [any(value == -999.0 for value in obj.values()) for obj in r] :
+            last_date -= timedelta(days=1)
+        else:
+            del r
+            break
+    json_string = await get_formated_dict(first_date.strftime("%Y%m%d"), 
+                                          last_date.strftime("%Y%m%d"),
+                                          latitude, longitude)    
     return json_string
 
 async def fetch_data(session, url):
@@ -46,8 +67,6 @@ async def get_formated_dict(START_DATE, END_DATE, latitude: str, longitude: str)
 ] 
     S_date = datetime.strptime(START_DATE, "%Y%m%d")
     F_date = datetime.strptime(END_DATE, "%Y%m%d")
-    # for parameter in PARAMETERS:
-        # for year in range(S_date.year, f_date.year):
           
     counter = 0
     years:List[datetime] = [S_date, F_date]
@@ -61,7 +80,6 @@ async def get_formated_dict(START_DATE, END_DATE, latitude: str, longitude: str)
             print(status)
         except requests.exceptions.RequestException as e:
             print(f"Error fetching data: {e}")
-            # return None
         
         try:
             keys = list(response_json['properties']['parameter'].keys())
@@ -81,27 +99,16 @@ async def get_formated_dict(START_DATE, END_DATE, latitude: str, longitude: str)
         counter +=1
         if len(years)-1 == counter:
             break
+    del years, counter, S_date, F_date, status, response_json, keys,first_date, last_date, url
     return prepare_object(req)
 
 def insert_year_in_medium(data1:datetime, data2:datetime, year_list:list):
     new_date = data1 + (data2 - data1) / 2
     f_index = year_list.index(data2)
     year_list.insert(f_index, new_date)
-        #    medium = len(years) // 2  
-        #         S_date = datetime.strptime(first_date, "%Y%m%d")
-        #         F_date = datetime.strptime(last_date, "%Y%m%d")
-        #         years.insert(medium, insert_year_in_medium(S_date, F_date))  
-    # year_list.index(data2.year)
+    del new_date, f_index
     return year_list
 def prepare_object(req):
-    # d={}
-    # for r in req:
-    #     print(r)
-    #     d[r] = list(req[r].values())
-    # d['date'] = list(req[0][list(req[0].keys())[0]].keys())
-
-    # df = pd.DataFrame.from_dict(req)
-    # json_data = df.to_dict(orient='records')
 
     timestamps = set(ts for subdict in req.values() for ts in subdict.keys())
     prepared_data = [
@@ -113,6 +120,7 @@ def prepare_object(req):
         }
         for ts in sorted(timestamps)
     ]
+    del timestamps
     return prepared_data
 
  

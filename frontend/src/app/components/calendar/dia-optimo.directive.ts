@@ -13,9 +13,9 @@ export class DiaOptimoDirective implements OnInit {
   }
   @HostListener('click')
   onClick() {
-    if (this.Dia.Optimo) {
+    // if (this.Dia.Optimo) {
       if(this.selectDay) this.selectDay(this.Dia.UTCDate);
-    }
+    // }
   }
 
   ngOnInit() {

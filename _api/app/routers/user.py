@@ -12,7 +12,7 @@ from sqlalchemy.orm import Session
 
 router = APIRouter(prefix="/api/user", tags=["User"])
 
-@router.put("/", status_code=status.HTTP_204_NO_CONTENT)
+@router.put("", status_code=status.HTTP_204_NO_CONTENT)
 async def update_user(is_autenticate: Annotated[bool, Depends(is_user_autenticate)], 
                       user: RequestUserUpdate = Body(...), 
                       db: Session = Depends(get_db)):

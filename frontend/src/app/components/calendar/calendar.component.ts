@@ -4,7 +4,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { DiaOptimoDirective } from './dia-optimo.directive';
 
 @Component({
-  selector: 'app-calendar',
+  selector: 'calendar',
   standalone: true,
   imports: [CommonModule, MatIconModule, DiaOptimoDirective],
   templateUrl: './calendar.component.html',
@@ -25,17 +25,18 @@ export class CalendarComponent{
   }
 
   @Output()
+  changeMonth = new EventEmitter<Date>();
+
+  @Output()
   selectedDay = new EventEmitter<Date>();
  
   @Input()
   public perfectDays: any[];
 
-  @Input()
-  public ListPerfectDays = (day:Date)=>{};
-
-  changeMonth(offset: number): void {
+  clickChangeMonth(offset: number): void {
       this.currentDate.setMonth(this.currentDate.getMonth() + offset);
       this.updateCalendar();
+      this.changeMonth.emit(this.currentDate);
   }
   updateCalendarColors(){
     if(!this.calendarContainer) return;
@@ -52,16 +53,18 @@ export class CalendarComponent{
           const perfectDay = this.perfectDays.filter(d => d.getTime() == day.Dia.UTCDate?.getTime())
           if(perfectDay.length > 0){
             day.Dia.Optimo = true;
-            day.Dia.onClick = this.selectDay;
           }
           else
             day.Dia.Optimo = false;
         }      
+        day.Dia.onClick = this.selectDay;
+
       }
   }
 
   getDatesInMonth(date: Date): DateCalendar[] {
-      const today = new Date();
+      const a = new Date();
+      const today = new Date(a.getFullYear(), a.getMonth(), a.getDate());
       const firstDayindex = (new Date(date.getFullYear(), date.getMonth(), 1).getDay() + 6) % 7;
       const lastDay = new Date(date.getFullYear(), date.getMonth() + 1, 0);
       const dates: DateCalendar[] = [];
@@ -70,12 +73,10 @@ export class CalendarComponent{
         const currentDate = new Date(date.getFullYear(), date.getMonth(), i);
         const isWeekend = currentDate.getDay() === 0 || currentDate.getDay() === 6; 
         const d:DateCalendar = {date:i.toString(), isWeekend:isWeekend, Dia:<D>{UTCDate:currentDate}}
-        if(d.Dia.UTCDate?.getDate() == today.getDate()) d.Dia.Today = true;
+        if(d.Dia.UTCDate?.getTime() == today.getTime()) d.Dia.Today = true;
         dates.push(d);
       }
 
-
-      // Adiciona células vazias antes do primeiro dia do mês
       for (let i = 0; i < firstDayindex; i++) {
         dates.unshift({ "date":"", Dia:<D>{}}); 
       }

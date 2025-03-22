@@ -9,17 +9,9 @@
             "type": "debugpy",
             "request": "launch",
             "module": "uvicorn",
-            "args": [
-                "app.main:app",
-                "--reload",
-                "--workers",
-                "3",
-                "--host",
-                "0.0.0.0"
-            ],
+            "args": ["app.main:app", "--reload", "--workers", "3", "--host", "0.0.0.0"],
             "jinja": true,
-            // Add env file for database env variables
-            "envFile": "${workspaceFolder}/.environment"
+            "envFile": "${workspaceFolder}/../.env"
         }
     ]
 }
