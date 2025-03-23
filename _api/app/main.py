@@ -8,7 +8,7 @@ from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
-from .interceptor.predict import predict, update_model_data
+from .interceptor.predict import predict
 from .interceptor.nasa_request import get_history_date, get_new_history_date
 from ._models.localidad import get_by_latitude_longitude, create, RequestLocalidadCreate
 from sqlalchemy.orm import Session

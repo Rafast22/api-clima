@@ -13,6 +13,9 @@ from .._view.auth.auth import is_user_autenticate
 from sqlalchemy.orm import Session
 from datetime import date, datetime, timedelta
 
+from .._view.localidad import localidad as M
+from ..interceptor.nasa_request import get_history_date
+from ..interceptor.predict import predict
 router = APIRouter(prefix="/api/user/weather/forecast", tags=["Previciones"])
 
 
@@ -62,3 +65,17 @@ async def get_previcion_periodo_month(is_autenticate: Annotated[bool, Depends(is
                                       db: Session = Depends(get_db) ):
 
     return get_previcion_total_from_today_view(db, tipo, cultivo, localidad)
+
+
+@router.get("testP")
+async def p(db: Session = Depends(get_db)):
+    d = db
+
+    l = M.get_by_latitude_longitude(d, "-25.65", "-54.70")
+    if not l:
+        new = M.RequestLocalidadCreate(**{'latitude':'-25.65', 'longitude':'-54.70', 'user_id':None, 'cultivo_id':None} )
+        l = M.create(d, new)
+    
+    h = await get_history_date(l.latitude, l.longitude)
+    predict(d, h, l)
+    del h, l, d
