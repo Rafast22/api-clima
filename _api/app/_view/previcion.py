@@ -2,11 +2,12 @@ from datetime import datetime, date, timedelta
 from collections import defaultdict
 from typing import List
 from .._models.predictions import Predictions
+from .._models.localidad import Localidad
 from .._models import predictions
 from sqlalchemy.orm import Session
 from fastapi import HTTPException, status
 from ..interceptor import predict
-
+from .._models.cultivo import Cultivo
 
 def get_previcion(db: Session, fecha_inicial:date, fecha_final:date ,tipo, cultivo):
     db_predictions = predictions.get_previcion(db, fecha_inicial, fecha_final)
@@ -90,7 +91,7 @@ def get_previcion_semana(db: Session, localidad:int):
 
     return new_data
 
-def get_previcion_semana_by_data(db: Session, localidad:int, data_inicial:datetime, data_final:datetime):
+def get_previcion_semana_by_data(db: Session, data_inicial:datetime, data_final:datetime, cultivo:Cultivo, localidad:Localidad):
 
     if data_final > data_inicial:
         raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=f" the date {str(data_final)} is greater than the date {str(data_inicial)}")
@@ -112,6 +113,14 @@ def get_previcion_semana_by_data(db: Session, localidad:int, data_inicial:dateti
     
     # mean = mean.map(lambda x: '{:.2f}'.format(x))
     # return mean.to_dict()
+
+    
+
+
+    # df['nota_plantio'] = df.apply(lambda x: calcular_nota(x, temp_ideal, precip_ideal, rad_ideal), axis=1)
+    # df['porcentagem_plantio'] = df['nota_plantio'].apply(calcular_porcentagem)
+
+
     return new_data
 
 

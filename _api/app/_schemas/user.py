@@ -45,16 +45,16 @@ class RequestUserBase(BaseModel):
     is_staff: Union[bool, None] = False
     is_active: Union[bool, None] = True
     role: Union[str, None] = "user"
+    
+
+class RequestUserCreate(RequestUserBase):
     class Config:
         from_attributes = True
 
-class RequestUserCreate(RequestUserBase):
-    pass
-
 class RequestUserUpdate(RequestUserBase):
     id: int 
-    last_login: Union[datetime, None] = None
-    date_joined: Union[datetime, None] = None
+    class Config:
+            from_attributes = True
 
 class RequestUserResponse(RequestUserUpdate):
     cultivos:list[RequestCultivo] = []

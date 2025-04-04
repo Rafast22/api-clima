@@ -10,6 +10,8 @@ class RequestDataBase(BaseModel):
     qv2m: float | None = None
     t2m: float | None = None
     ws2m: float | None = None
+    acuracia_previsao: float | None = None
+    probabilidade_chuva: float | None = None
         
 class RequestDataCreate(RequestDataBase):
     class Config:

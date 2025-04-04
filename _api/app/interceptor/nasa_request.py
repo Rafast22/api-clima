@@ -53,18 +53,12 @@ async def fetch_request(url):
 async def get_formated_dict(START_DATE, END_DATE, latitude: str, longitude: str):
     req = {}
     PARAMETERS = [
-    #Relative Humidity at 2 Meters
         "RH2M",
-    #Specific Humidity at 2 Meters
         "QV2M",
-    #Temperature at 2 Meters
         "T2M",
-    #
         "PRECTOTCORR",
-    #    
-        "WS2M"
-    #add radiacion solar
-] 
+        "WS2M"]
+     
     S_date = datetime.strptime(START_DATE, "%Y%m%d")
     F_date = datetime.strptime(END_DATE, "%Y%m%d")
           

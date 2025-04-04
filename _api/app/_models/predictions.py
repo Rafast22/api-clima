@@ -8,13 +8,6 @@ from fastapi import HTTPException, status
 from datetime import datetime, timedelta, date
 class Predictions(Base):
     __tablename__ = "Predictions"
-    def __init__(self, history: RequestDataCreate):
-        self.date = history.date
-        self.prectotcorr = history.prectotcorr
-        self.rh2m = history.rh2m
-        self.qv2m = history.qv2m
-        self.t2m = history.t2m
-        self.ws2m = history.ws2m
     
     id = Column(Integer, primary_key=True, index=True)
     date = Column(DateTime, nullable=True)
@@ -23,6 +16,8 @@ class Predictions(Base):
     qv2m = Column(DECIMAL(10, 3), nullable=True)
     t2m = Column(DECIMAL(10, 3), nullable=True)
     ws2m = Column(DECIMAL(10, 3), nullable=True)
+    acuracia_previsao = Column(DECIMAL(5, 2), nullable=True)
+    probabilidade_chuva = Column(DECIMAL(5, 2), nullable=True)
     localidad_id = Column(Integer, ForeignKey('Localidad.id'), nullable=False)
     
 
@@ -61,20 +56,20 @@ def gravar_bulk(db: Session, data: list[RequestDataCreate]):
     
     
 def create_bulk(db: Session, datas: list[RequestDataCreate], localidad_id:int):
-    lista_de_objetos = [RequestDataCreate(**dicionario) for dicionario in datas]
+    # lista_de_objetos = [RequestDataCreate(**dicionario) for dicionario in datas]
 
     if not isinstance(datas, list):
         raise HTTPException(status_code=400, detail="Os dados devem ser uma lista")
 
-    for data in lista_de_objetos:
-            existing_record = (db.query(Predictions).filter(Predictions.date == data.date).first())
+    for data in datas:
+            existing_record = (db.query(Predictions).filter(Predictions.date == data['date']).first())
 
             if existing_record:
                 [setattr(existing_record, key, value) for key, value in vars(data).items() ]
                 db.add(existing_record)
 
             else:
-                new_record = Predictions(data)
+                new_record = Predictions(**data)
                 new_record.localidad_id = localidad_id
                 db.add(new_record)
 

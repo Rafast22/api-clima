@@ -10,8 +10,10 @@ from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from .interceptor.predict import predict
 from .interceptor.nasa_request import get_history_date, get_new_history_date
-from ._models.localidad import get_by_latitude_longitude, create, RequestLocalidadCreate
+from ._schemas.localidad import RequestLocalidadCreate
+from ._models.localidad import Localidad
 from sqlalchemy.orm import Session
+from sqlalchemy import inspect
 from fastapi import Depends
 router = APIRouter()
 # templates = Jinja2Templates(directory="/home/rafa/Projects/Python/api-clima/frontend/dist/front/browser/")
@@ -32,23 +34,27 @@ origins = [
 #update_model_data
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    # Base.metadata.create_all(bind=engine)
+
+    # inspector = inspect(engine)
+    # if inspector.has_table("User"):
+    #     Base.metadata.drop_all(bind=engine)
+    
     Base.metadata.create_all(bind=engine)
     yield
     
 async def fetch_request(db):
-    # d = next(db)
-    d = db
 
-    l = get_by_latitude_longitude(d, "-25.65", "-54.70")
-    if not l:
+    db_localidades = Localidad.get_by_latitude_longitude(db, "-25.65", "-54.70")
+    if len(db_localidades) > 0:
+        db_localidad = db_localidades[0]
+    if not db_localidad:
         new = RequestLocalidadCreate(**{'latitude':'-25.65', 'longitude':'-54.70', 'user_id':None, 'cultivo_id':None} )
-        l = create(d, new)
+        db_localidad = Localidad.create(db, **new.model_dump())
     
-    h = await get_history_date(l.latitude, l.longitude)
-    predict(d, h, l)
-    del h, l, d
-
-    
+    h = await get_history_date(db_localidad.latitude, db_localidad.longitude)
+    predict(db, h, db_localidad)
+    del h, db_localidad
 
 
 app = FastAPI(lifespan=lifespan)    
