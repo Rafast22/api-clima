@@ -9,7 +9,7 @@ from .base_model import BaseModel
 class User(BaseModel):
     __tablename__ = "User"
          
-    username = Column(String, index=True, unique=True)
+    username = Column(String, index=True)
     password = Column(String, index=True)
     full_name = Column(String, index=True)
     email = Column(String, index=True, unique=True)
@@ -23,7 +23,7 @@ class User(BaseModel):
 
     def verify_password(self, plain_password):
         return pwd_context.verify(plain_password, self.password)
-
+    
     def get_password_hash(password):
         return pwd_context.hash(password)
 
@@ -46,3 +46,11 @@ class User(BaseModel):
                                             User.email,
                                             User.full_name,
                                             User.password)).filter(User.username == username).first()
+    @classmethod
+    def create(cls, session, **kwargs):
+        instance = cls(**kwargs)
+        instance.password = cls.get_password_hash(instance.password)
+        session.add(instance)
+        session.commit()
+        session.refresh(instance)
+        return instance

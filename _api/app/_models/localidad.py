@@ -36,6 +36,19 @@ class Localidad(BaseModel):
             raise HTTPException(status_code=status.HTTP_302_FOUND, detail='Cultivo found but not has Localidad')
             
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Cultivo not found')
+    
+
+    @staticmethod
+    def self_update(self, session: Session):
+        session.commit()
+        session.refresh(self)
+        return self
+        # if cultivo: 
+        #     if cultivo.localidad_id:
+        #         return db.query(Localidad).filter(Localidad.id == cultivo.localidad_id).first()
+        #     raise HTTPException(status_code=status.HTTP_302_FOUND, detail='Cultivo found but not has Localidad')
+            
+        # raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Cultivo not found')
 
 
     
