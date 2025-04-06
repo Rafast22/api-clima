@@ -38,6 +38,9 @@ services:
       SMTP_PASSWORD: ${SMTP_PASSWORD}
       SMTP_SERVER: ${SMTP_SERVER}
       SMTP_PORT: ${SMTP_PORT}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
   angular:
     build: ./frontend/
     container_name: angular_container
