@@ -13,8 +13,8 @@ from .interceptor.nasa_request import get_history_date, get_new_history_date
 from ._schemas.localidad import RequestLocalidadCreate
 from ._models.localidad import Localidad
 from sqlalchemy.orm import Session
-from sqlalchemy import inspect
-from fastapi import Depends
+from sqlalchemy import inspect, or_
+from fastapi import Depends, Request, Response
 router = APIRouter()
 # templates = Jinja2Templates(directory="/home/rafa/Projects/Python/api-clima/frontend/dist/front/browser/")
 
@@ -41,11 +41,34 @@ async def lifespan(app: FastAPI):
     #     Base.metadata.drop_all(bind=engine)
     
     Base.metadata.create_all(bind=engine)
+
+    with next(get_db()) as db:
+        await verificar_e_criar_registros(db)
+
     yield
     
+async def verificar_e_criar_registros(db: Session):
+    from ._models.cultivo import Cultivo
+    
+    cultivo = db.query(Cultivo).filter(or_(Cultivo.name == 'Maiz', Cultivo.name == 'Soja', Cultivo.name == 'Trigo')).all()
+    if not cultivo:
+        cultivos_iniciais = [
+            {"name": "Trigo", "variety": "Comum", "cycle_duration": 150},  # Exemplo em dias
+            {"name": "Maiz", "variety": "Comum", "cycle_duration": 180},
+            {"name": "Soja", "variety": "Comum", "cycle_duration": 120},
+        ]
+        for cultivo_data in cultivos_iniciais:
+            cult = Cultivo(**cultivo_data)            
+            db.add(cult)
+            db.commit()
+        print("Registros iniciais criados com sucesso.")
+    else:
+        print("Registros existentes encontrados. Nenhuma ação necessária.")
+
 async def fetch_request(db):
 
     db_localidades = Localidad.get_by_latitude_longitude(db, "-25.65", "-54.70")
+    db_localidad = None
     if len(db_localidades) > 0:
         db_localidad = db_localidades[0]
     if not db_localidad:
@@ -76,6 +99,10 @@ scheduler.start()
 # async def root(request: Request):
     
 #     return templates.TemplateResponse("index.html", {"request": request})
+
+@router.get("/")
+async def root(request:Request):
+    return RedirectResponse("/docs")
 
 @router.get("/test/preditct")
 async def f(db: Session = Depends(get_db)):

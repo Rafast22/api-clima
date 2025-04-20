@@ -22,6 +22,7 @@
     text-align: center;
     user-select: none;
     /* pointer-events: none; */
+    min-width: 7fr;
 }
 
 .dates {
@@ -57,6 +58,7 @@
 .perfect-date:active{
     transform: scale(0.75);
 }
+
 .today{
     border: 1px solid #ccc
 }
@@ -98,4 +100,3 @@
     
   }
 
-  

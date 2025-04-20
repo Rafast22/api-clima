@@ -1,28 +1,17 @@
 import pandas as pd
-from pandas import DataFrame
-from sklearn.tree import DecisionTreeRegressor
-from .._models import nasa_data, predictions as pr
+from .._models.predictions import Predictions
 from .._models.localidad import Localidad
-from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import Session
 import pickle
-import os
+from scipy.stats import norm
+
 import numpy as np
 from sklearn.model_selection import train_test_split
 import xgboost as xgb
 from dateutil.relativedelta import relativedelta
 from datetime import timedelta, datetime
 from sklearn.metrics import accuracy_score, precision_score
-from sklearn.metrics import accuracy_score, precision_score, mean_absolute_error, mean_squared_error
+from sklearn.metrics import accuracy_score, precision_score, mean_absolute_error, root_mean_squared_error, mean_squared_error
 from scipy.special import expit
-def load_dataframe(db:Session) -> DataFrame:
-    db_data = nasa_data.get_historico(db)
-    if not isinstance(db_data, list):
-        data = dict(db_data)
-    else:
-        data = [dict(r) for r in db_data]
-    data = [dict(r) for r in db_data]
-    return pd.DataFrame.from_records(data)
 
 def prepare_data(df):
     if "localidad_id" in df.columns:
@@ -43,158 +32,7 @@ def prepare_data(df):
 
     return df
 
-def predictA(db: Session, history_data, local: Localidad, update: bool = False):
-    df = pd.DataFrame([item for item in history_data])
-    df = prepare_data(df)  
-
-    # prediction_horizon = 720
-    first = history_data[-1]["Date"]
-    last = first + relativedelta(months=6)
-    horizon = last - first
-    prediction_horizon = int(horizon.total_seconds() / 3600)
-    train_data = df[:-prediction_horizon]
-    test_data = df[-prediction_horizon:]
-
-    feature_list = ['year', 'month', 'day', 'hour', 't2m', 'rh2m', 'prectotcorr', 'qv2m', 'ws2m']
-    ignore_data_list = ['year', 'month', 'day', 'hour']
-
-    predictions = {}
-
-    for target in feature_list:
-        if target not in ignore_data_list:
-            new_features = [f for f in feature_list if f != target]
-            X_train = train_data[new_features]
-            y_train = train_data[target]
-            X = df[new_features]
-            y = df[target]
-            # X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
-            try:
-                model = pickle.loads(getattr(local, f'model_{target}'))
-                model.fit(X_train, y_train, xgb_model=model)
-
-            except Exception as ex:
-                model = xgb.XGBRegressor(random_state=100, learning_rate=0.05)
-                model.fit(X_train, y_train)
-
-            X_test = test_data[new_features]
-
-            if target == 'prectotcorr':
-                positive_predictions = np.maximum(model.predict(X_test).round(2), 0)
-                predictions[target] = positive_predictions
-                del positive_predictions
-            else:
-                predictions[target] = model.predict(X_test).round(2)
-
-
-            setattr(local, f'model_{target}', pickle.dumps(model))
-
-    last_date = df.index[-1]
-    date_range = pd.date_range(start=last_date + timedelta(hours=1), periods=prediction_horizon, freq='h')
-    predictions['date'] = date_range
-
-    predictions_df = pd.DataFrame(predictions)
-
-    d = predictions_df.to_dict(orient='records')
-
-    # if update:
-    #     pr.delete_bulk_by_date(db, datetime.now(), [f for f in d].sort()[-1])
-    local.last_request = history_data[-1]["Date"]
-    Localidad.update(db, local)
-    pr.create_bulk(db, d, local.id)
-
-def predictB(db: Session, history_data, local: Localidad, update: bool = False):
-    df = pd.DataFrame([item for item in history_data])
-    df = prepare_data(df) 
-
-    first = history_data[-1]["Date"]
-    last = first + relativedelta(months=12)
-    horizon = last - first
-    prediction_horizon = int(horizon.total_seconds() / 3600)
-    train_data = df[:-prediction_horizon]
-    test_data = df[-prediction_horizon:]
-
-    feature_list = ['year', 'month', 'day', 'hour', 't2m', 'rh2m', 'prectotcorr', 'qv2m', 'ws2m']
-    ignore_data_list = ['year', 'month', 'day', 'hour']
-
-    predictions = {}
-    model_performance = {}
-    for target in feature_list:
-        if target not in ignore_data_list:
-            new_features = [f for f in feature_list if f != target]
-            X_train = train_data[new_features]
-            y_train = train_data[target]
-            X_test = test_data[new_features]
-            y_test = test_data[target]  # Para avaliar o modelo
-
-            try:
-                model = pickle.loads(getattr(local, f'model_{target}'))
-                model.fit(X_train, y_train, xgb_model=model)
-            except Exception:
-                model = xgb.XGBRegressor(random_state=100, learning_rate=0.05)
-                model.fit(X_train, y_train)
-
-            predictions[target] = model.predict(X_test).round(2)
-
-            y_pred_train = model.predict(X_train).round(2)
-            if target == 'prectotcorr':  
-                y_train_bin = (y_train > 0.1).astype(int)  
-                y_pred_bin = (y_pred_train > 0.1).astype(int)
-                accuracy = accuracy_score(y_train_bin, y_pred_bin)
-                precision = precision_score(y_train_bin, y_pred_bin, zero_division=0)
-                model_performance[target] = {'accuracy': accuracy, 'precision': precision}
-
-            setattr(local, f'model_{target}', pickle.dumps(model))
-
-    last_date = df.index[-1]
-    date_range = pd.date_range(start=last_date + timedelta(hours=1), periods=prediction_horizon, freq='h')
-    predictions['date'] = date_range
-
-    predictions_df = pd.DataFrame(predictions)
-
-    def calculate_rain_probability(prectotcorr):
-        prob = 1 / (1 + np.exp(-(prectotcorr - 0.1) * 10))  
-        return np.clip(prob * 100, 0, 100).round(0)
-
-    predictions_df['probabilidade_chuva'] = calculate_rain_probability(predictions_df['prectotcorr'])
-
-    def calculate_forecast_confidence(prectotcorr, y_train, y_pred_train, model_accuracy, model_precision):
-        """
-        Calcula a confiança da previsão, considerando a precisão, acurácia e a probabilidade prevista pelo modelo.
-        """
-        # Converte valores para probabilidades usando a função sigmoide
-        y_train_prob = expit(y_train)
-        y_pred_train_prob = expit(y_pred_train)
-
-        probability_similarity = 1 - np.abs(y_train_prob - y_pred_train_prob).mean()
-
-        base_confidence = (model_accuracy * 0.5 + model_precision * 0.3 + probability_similarity * 0.2)
-        
-        confidence = base_confidence * (1 - np.exp(-prectotcorr))
-        
-        return np.clip(confidence * 100, 0, 100).round(2)
-
-    prectotcorr_performance = model_performance.get('prectotcorr', {'accuracy': 0.8, 'precision': 0.7})  # Valores padrão
-    predictions_df['acuracia_previsao'] = calculate_forecast_confidence(
-        predictions_df['prectotcorr'],
-        y_train,
-        model.predict(X_train),
-        prectotcorr_performance['accuracy'],
-        prectotcorr_performance['precision']
-
-    )
-
-    d = predictions_df.to_dict(orient='records')
-
-    local.last_request = history_data[-1]["Date"]
-    Localidad.update(db, local)
-    pr.create_bulk(db, d, local.id)
-
-    del prectotcorr_performance
-    
-    return predictions_df   
-
 def train_xgb_model(X_train, y_train, existing_model=None):
-    """Treina ou carrega um modelo XGBoost."""
     if existing_model:
         model = pickle.loads(existing_model)
     else:
@@ -211,23 +49,27 @@ def train_xgb_model(X_train, y_train, existing_model=None):
     
     return model
 
-def evaluate_model(y_true, y_pred, feature_name):
-    """Avalia o modelo usando métricas apropriadas e faz log dos resultados."""
-    mae = mean_absolute_error(y_true, y_pred)
-    rmse = mean_squared_error(y_true, y_pred, squared=False)
-    return {'mae': mae, 'rmse': rmse}
+def calculate_rain_probability_expanded(df):
+    prob = 0
+    peso_precipitacao = 0.1
+    peso_temperatura = -0.15
+    peso_umidade_relativa = 0.2
+    peso_umidade_especifica = 0.3
+    peso_vento = -0.05
+    precip_norm = df['prectotcorr'] / df['prectotcorr'].max() if df['prectotcorr'].max() > 0 else 0
+    temp_norm = (df['t2m'] - df['t2m'].min()) / (df['t2m'].max() - df['t2m'].min()) if (df['t2m'].max() - df['t2m'].min()) > 0 else 0.5
+    ur_norm = df['rh2m'] / 100
+    ue_norm = df['qv2m'] / df['qv2m'].max() if df['qv2m'].max() > 0 else 0
+    vento_norm = df['ws2m'] / df['ws2m'].max() if df['ws2m'].max() > 0 else 0
 
+    prob += peso_precipitacao * precip_norm
+    prob += peso_temperatura * temp_norm
+    prob += peso_umidade_relativa * ur_norm
+    prob += peso_umidade_especifica * ue_norm
+    prob += peso_vento * vento_norm
 
-def calculate_rain_probability(prectotcorr):
-    """Calcula a probabilidade de chuva baseada na precipitação prevista."""
-    prob = 1 / (1 + np.exp(-(prectotcorr - 0.1) * 10))
-    return np.clip(prob * 100, 0, 100).round(0)
-
-def calculate_forecast_confidence(prectotcorr, model_accuracy, model_precision):
-    """Calcula a confiança na previsão, combinando acurácia e precisão."""
-    base_confidence = model_accuracy * 0.7 + model_precision * 0.3
-    confidence = base_confidence * (1 - np.exp(-prectotcorr))
-    return np.clip(confidence * 100, 0, 100).round(2)
+    prob = np.clip(prob, 0, 1) * 100
+    return prob.round(0)
 
 def predict(db, history_data, local:Localidad, update=False):
     
@@ -238,12 +80,13 @@ def predict(db, history_data, local:Localidad, update=False):
     last = first + relativedelta(months=12)
     horizon = int((last - first).total_seconds() / 3600)
 
-    feature_list = ['year', 'month', 'day', 'hour', 't2m', 'rh2m', 'prectotcorr', 'qv2m', 'ws2m']
+    feature_list = ['year', 'month', 'day', 'hour', 't2m', 'rh2m', 'prectotcorr', 'qv2m', 'ws2m', 'ps']
     ignore_data_list = ['year', 'month', 'day', 'hour']
 
     train_data, test_data = train_test_split(df, test_size=horizon / len(df), shuffle=False)
 
     predictions = {}
+    accuracy_list = {}
     model_performance = {}
 
     for target in feature_list:
@@ -251,63 +94,199 @@ def predict(db, history_data, local:Localidad, update=False):
             new_features = [f for f in feature_list if f != target]
             X_train, y_train = train_data[new_features], train_data[target]
             X_test, y_test = test_data[new_features], test_data[target]
-
             model = train_xgb_model(X_train, y_train, getattr(local, f'model_{target}', None))
-            predictions[target] = model.predict(X_test).round(2)
-
+            y_pred = model.predict(X_test).round(2)
             y_pred_train = model.predict(X_train).round(2)
-            evaluation_results = evaluate_model(y_test, predictions[target], target)
-            print(evaluation_results)
+            
+            predictions[target] = y_pred
+
+            accuracy_list[f"{target}_accuracy"] = calculate_accuracy(y_test, y_pred)
+
             if target == 'prectotcorr':  
+                predictions[target] = np.where(predictions[target] < 0, 0, predictions[target]).round(2)
+
+                y_pred_train = np.maximum(y_pred_train, 0)
                 y_train_bin, y_pred_bin = (y_train > 0.1).astype(int), (y_pred_train > 0.1).astype(int)
                 accuracy = accuracy_score(y_train_bin, y_pred_bin)
                 precision = precision_score(y_train_bin, y_pred_bin, zero_division=0)
                 model_performance[target] = {'accuracy': accuracy, 'precision': precision}
 
             setattr(local, f'model_{target}', pickle.dumps(model))
-
+            del y_pred, X_test, X_train, y_test, y_train,
     predictions['date'] = pd.date_range(start=df.index[-1] + timedelta(hours=1), periods=horizon, freq='h')
+
     predictions_df = pd.DataFrame(predictions)
 
-    predictions_df['probabilidade_chuva'] = calculate_rain_probability(predictions_df['prectotcorr'])
+    accuracy_list = pd.DataFrame(accuracy_list)
+    # predictions_df = predictions_df[[k for k in predictions.keys() if 'accuracy' not in k ]]
 
-    prectotcorr_performance = model_performance.get('prectotcorr', {'accuracy': 0.8, 'precision': 0.7})
-    predictions_df['acuracia_previsao'] = calculate_forecast_confidence(
-        predictions_df['prectotcorr'],
-        prectotcorr_performance['accuracy'],
-        prectotcorr_performance['precision']
-    )
+    predictions_df['model_accuracy'] = accuracy_list.apply(calculate_accuracy_mean, axis=1)
 
+    
+    predictions_df['probability_rain'] = calculate_rain_probability_expanded(predictions_df)
+    
     local.last_request = history_data[-1]["Date"]
-    # Localidad.update(local, db)
-    pr.create_bulk(db, predictions_df.to_dict(orient='records'), local.id)
+    Localidad.update(local, db)
+    Predictions.create_bulk(db, local.id, predictions_df.to_dict(orient='records'))
 
     return predictions_df
 
-def classify_good_colheita(df):
-    df['label'] = ((df['prectotcorr'] == 0) & 
-               (df['t2m'] > 22) & (df['t2m'] < 28) &
-               (df['rh2m'] < 60)).astype(int)  
+def calculate_accuracy(test_y, pre_y):
+    with np.errstate(divide='ignore', invalid='ignore'):
+        relative_error = np.abs(test_y - pre_y) / np.abs(test_y)
+    cond_zero = np.abs(test_y) < 1e-8
+    acc_percentual = np.where(
+        cond_zero,
+        np.where(np.abs(pre_y) < 1e-8, 100.0, 0.0),
+        100 * (1 - relative_error)
+    )
 
+    return acc_percentual
 
+def calculate_accuracy_mean(row):
+    np_array = row.to_numpy()
+    return np.mean(np_array)
 
-def atribuir_nota(valor, faixa_ideal, peso=1):
-    if valor < faixa_ideal[0]:
-        return 1
-    elif valor > faixa_ideal[1]:
-        return 1
+def gaussian_score(value, ranges):
+    score = 0.0
+    for (min_val, max_val, sigma) in ranges:
+        mean = (min_val + max_val) / 2
+        if min_val <= value <= max_val:
+            score = max(score, norm.pdf(value, mean, sigma) / norm.pdf(mean, mean, sigma))
+    return score
+
+def _classify_day_harvest(row, crop_type):
+    t2m_media = row['t2m']
+    rh2m_media = row['rh2m']
+    prectotcorr_media = row['prectotcorr']
+    qv2m_media = row['qv2m']
+    ws2m_media = row['ws2m']
+
+    thresholds = {
+        'soja': {
+            't2m': [(25, 30, 2.5), (20, 25, 2.0), (15, 20, 1.5), (30, 35, 2.0), (35, 40, 1.5)],
+            'rh2m': [(50, 60, 2.0), (45, 50, 1.5), (40, 45, 1.0), (60, 65, 1.5), (65, 70, 1.0)],
+            'prectotcorr': [(0, 2, 1.5), (2, 5, 1.0), (5, 10, 0.5), (10, 15, 0.0)],
+            'qv2m': [(8, 11, 2.0), (7, 8, 1.5), (6, 7, 1.0), (11, 13, 1.5), (13, 15, 1.0)],
+            'ws2m': [(0, 3, 1.5), (3, 5, 1.0), (5, 7, 0.5)]
+        },
+        'mais': {
+            't2m': [(25, 32, 2.5), (20, 25, 2.0), (15, 20, 1.5), (32, 35, 2.0), (35, 38, 1.5)],
+            'rh2m': [(50, 60, 2.0), (45, 50, 1.5), (40, 45, 1.0), (60, 65, 1.5), (65, 70, 1.0)],
+            'prectotcorr': [(0, 1, 1.5), (1, 3, 1.0), (3, 8, 0.5), (8, 15, 0.0)],
+            'qv2m': [(9, 12, 2.0), (8, 9, 1.5), (7, 8, 1.0), (12, 14, 1.5), (14, 16, 1.0)],
+            'ws2m': [(0, 3, 1.5), (3, 5, 1.0), (5, 7, 0.5)]
+        },
+        'trigo': {
+            't2m': [(15, 20, 2.5), (12, 15, 2.0), (10, 12, 1.5), (20, 25, 2.0), (25, 28, 1.5)],
+            'rh2m': [(50, 70, 2.0), (45, 50, 1.5), (40, 45, 1.0), (70, 75, 1.5), (75, 80, 1.0)],
+            'prectotcorr': [(0, 2, 1.5), (2, 5, 1.0), (5, 10, 0.5), (10, 15, 0.0)],
+            'qv2m': [(7, 10, 2.0), (6, 7, 1.5), (5, 6, 1.0), (10, 12, 1.5), (12, 14, 1.0)],
+            'ws2m': [(0, 5, 1.5), (5, 7, 1.0), (7, 9, 0.5)]
+        },
+        'default': {
+            't2m': [(20, 28, 2.5), (18, 20, 2.0), (15, 18, 1.5), (28, 32, 2.0), (32, 35, 1.5)],
+            'rh2m': [(50, 70, 2.0), (45, 50, 1.5), (40, 45, 1.0), (70, 80, 1.5), (80, 85, 1.0)],
+            'prectotcorr': [(0, 2, 1.5), (2, 5, 1.0), (5, 10, 0.5), (10, 15, 0.0)],
+            'qv2m': [(8, 11, 2.0), (7, 8, 1.5), (6, 7, 1.0), (11, 13, 1.5), (13, 15, 1.0)],
+            'ws2m': [(0, 4, 1.5), (4, 6, 1.0), (6, 8, 0.5)]
+        }
+    }
+
+    if crop_type in thresholds:
+        crop_thresholds = thresholds[crop_type]
     else:
-        return 5 - int(np.abs(np.mean(faixa_ideal) - valor) / (np.mean(faixa_ideal) - min(faixa_ideal)) * 4) * peso
+        print(f"Aviso: Cultura '{crop_type}' não reconhecida. Usando valores genéricos.")
+        crop_thresholds = thresholds['default']
 
-def calcular_nota(dia, temp_ideal, precip_ideal, rad_ideal):
-    nota = 0
-    if temp_ideal[0] <= dia['temperatura'] <= temp_ideal[1]:
-        nota += 2
-    if precip_ideal[0] <= dia['precipitacao'] <= precip_ideal[1]:
-        nota += 2
-    if rad_ideal[0] <= dia['radiacao'] <= rad_ideal[1]:
-        nota += 1
-    return nota
 
-def calcular_porcentagem(nota):
-    return (nota / 5) * 100
+    weights = {'t2m': 0.3, 'rh2m': 0.25, 'prectotcorr': 0.2, 'qv2m': 0.15, 'ws2m': 0.1}
+    score = 0.0
+    score += integrated_gaussian_score(t2m_media, crop_thresholds['t2m']) * weights['t2m']
+    score += integrated_gaussian_score(rh2m_media, crop_thresholds['rh2m']) * weights['rh2m']
+    score += integrated_gaussian_score(prectotcorr_media, crop_thresholds['prectotcorr']) * weights['prectotcorr']
+    score += integrated_gaussian_score(qv2m_media, crop_thresholds['qv2m']) * weights['qv2m']
+    score += integrated_gaussian_score(ws2m_media, crop_thresholds['ws2m']) * weights['ws2m']
+
+    percentage = score * 100 / sum(weights.values())
+
+    return min(max(percentage, 0), 100)
+
+def _classify_day_planting(row, crop_type):
+    t2m_media = row['t2m']
+    rh2m_media = row['rh2m']
+    prectotcorr_media = row['prectotcorr']
+    qv2m_media = row['qv2m']
+    ws2m_media = row['ws2m']
+
+    thresholds = {
+        'soja': {
+            't2m': [(20, 30, 2.5), (18, 20, 2.0), (15, 18, 1.5), (32, 35, 1.5)],
+            'rh2m': [(60, 80, 2.0), (55, 60, 1.5), (50, 55, 1.0), (80, 85, 1.5), (85, 90, 1.0)],
+            'prectotcorr': [(2, 10, 1.5), (0, 2, 1.0), (10, 15, 1.0), (15, 20, 0.5)],
+            'qv2m': [(8, 12, 2.0), (7, 8, 1.5), (6, 7, 1.0), (12, 14, 1.5), (14, 16, 1.0)],
+            'ws2m': [(0, 4, 1.5), (4, 6, 1.0), (6, 8, 0.5)]
+        },
+        'mais': {
+            't2m': [(25, 32, 2.5), (20, 25, 2.0), (18, 20, 1.5), (32, 35, 2.0), (35, 38, 1.5)],
+            'rh2m': [(65, 85, 2.0), (60, 65, 1.5), (55, 60, 1.0), (85, 90, 1.5), (90, 95, 1.0)],
+            'prectotcorr': [(5, 15, 1.5), (2, 5, 1.0), (15, 20, 1.0), (20, 25, 0.5)],
+            'qv2m': [(9, 13, 2.0), (8, 9, 1.5), (7, 8, 1.0), (13, 15, 1.5), (15, 17, 1.0)],
+            'ws2m': [(0, 3, 1.5), (3, 5, 1.0), (5, 7, 0.5)]
+        },
+        'trigo': {
+            't2m': [(15, 20, 2.5), (12, 15, 2.0), (10, 12, 1.5), (20, 25, 2.0), (25, 28, 1.5)],
+            'rh2m': [(50, 70, 2.0), (45, 50, 1.5), (40, 45, 1.0), (70, 75, 1.5), (75, 80, 1.0)],
+            'prectotcorr': [(2, 8, 1.5), (0, 2, 1.0), (8, 12, 1.0), (12, 15, 0.5)],
+            'qv2m': [(7, 10, 2.0), (6, 7, 1.5), (5, 6, 1.0), (10, 12, 1.5), (12, 14, 1.0)],
+            'ws2m': [(0, 5, 1.5), (5, 7, 1.0), (7, 9, 0.5)]
+        },
+        'default': {
+            't2m': [(18, 28, 2.5), (15, 18, 2.0), (12, 15, 1.5), (28, 32, 2.0), (32, 35, 1.5)],
+            'rh2m': [(60, 80, 2.0), (55, 60, 1.5), (50, 55, 1.0), (80, 90, 1.5), (90, 95, 1.0)],
+            'prectotcorr': [(2, 10, 1.5), (0, 2, 1.0), (10, 15, 1.0), (15, 20, 0.5)],
+            'qv2m': [(8, 12, 2.0), (6, 8, 1.5), (5, 6, 1.0), (12, 14, 1.5), (14, 16, 1.0)],
+            'ws2m': [(0, 4, 1.5), (4, 6, 1.0), (6, 8, 0.5)]
+        }
+    }
+
+    if crop_type in thresholds:
+        crop_thresholds = thresholds[crop_type]
+    else:
+        print(f"Aviso: Cultura '{crop_type}' não reconhecida. Usando valores genéricos.")
+        crop_thresholds = thresholds['default']
+
+    weights = {'t2m': 0.3, 'rh2m': 0.25, 'prectotcorr': 0.2, 'qv2m': 0.15, 'ws2m': 0.1}
+    score = 0.0
+    # score += gaussian_score(t2m_media, crop_thresholds['t2m']) * weights['t2m']
+    # score += gaussian_score(rh2m_media, crop_thresholds['rh2m']) * weights['rh2m']
+    # score += gaussian_score(prectotcorr_media, crop_thresholds['prectotcorr']) * weights['prectotcorr']
+    # score += gaussian_score(qv2m_media, crop_thresholds['qv2m']) * weights['qv2m']
+    # score += gaussian_score(ws2m_media, crop_thresholds['ws2m']) * weights['ws2m']
+
+    score += integrated_gaussian_score(t2m_media, crop_thresholds['t2m']) * weights['t2m']
+    score += integrated_gaussian_score(rh2m_media, crop_thresholds['rh2m']) * weights['rh2m']
+    score += integrated_gaussian_score(prectotcorr_media, crop_thresholds['prectotcorr']) * weights['prectotcorr']
+    score += integrated_gaussian_score(qv2m_media, crop_thresholds['qv2m']) * weights['qv2m']
+    score += integrated_gaussian_score(ws2m_media, crop_thresholds['ws2m']) * weights['ws2m']
+
+
+    percentage = score * 100 / sum(weights.values())
+
+    return min(max(percentage, 0), 100)
+
+def integrated_gaussian_score(value, ranges):
+    score = 0.0
+    for min_val, max_val, sigma in ranges:
+        mean = (min_val + max_val) / 2
+        if min_val <= value <= max_val:
+            lower_cdf = norm.cdf(min_val, mean, sigma)
+            upper_cdf = norm.cdf(max_val, mean, sigma)
+            max_cdf = norm.cdf(mean, mean, sigma)
+            if max_cdf > 0:
+                score = max(score, (upper_cdf - lower_cdf) / (2 * max_cdf))
+            elif lower_cdf == upper_cdf and lower_cdf == 0.5:
+                score = 1.0
+    return score
+
+

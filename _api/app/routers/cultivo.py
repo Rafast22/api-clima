@@ -23,7 +23,7 @@ async def get_cultivo_by_id(cultivo_id: int,
                             ):
     return get_cultivo_by_id_view(db, cultivo_id)
 
-@router.post("/", status_code=status.HTTP_201_CREATED)
+@router.post("", status_code=status.HTTP_201_CREATED)
 async def create_cultivo(is_autenticate: Annotated[bool, Depends(is_user_autenticate)], 
                         cultivo: RequestCultivoCreate = Body(...), 
                         db: Session = Depends(get_db), 
@@ -32,9 +32,10 @@ async def create_cultivo(is_autenticate: Annotated[bool, Depends(is_user_autenti
 
 @router.put("/{cultivo_id}", status_code=status.HTTP_204_NO_CONTENT)
 async def update_cultivo(is_autenticate: Annotated[bool, Depends(is_user_autenticate)], 
-                         user:RequestCultivo = Body(...), 
+                         cultivo_id:int, 
+                         cultivo:RequestCultivo = Body(...), 
                          db: Session = Depends(get_db)):
-    return update_cultivo_view(db, user)
+    return update_cultivo_view(db, cultivo_id, cultivo)
 
 @router.delete("/{cultivo_id}", status_code=status.HTTP_202_ACCEPTED)
 async def delete_cultivo_by_id(cultivo_id: int, 

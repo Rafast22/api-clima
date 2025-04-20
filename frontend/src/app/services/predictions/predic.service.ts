@@ -1,6 +1,6 @@
 import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { lastValueFrom, take } from 'rxjs';
+import { lastValueFrom, Observable, take } from 'rxjs';
 import { BaseService } from '../base.service';
 import { Predict } from '../../models/predict';
 
@@ -41,7 +41,7 @@ export class PredicService extends BaseService<Predict, number> {
     //     params: params
     //   })
     // );
-    return this.http.get<any>(`${this.baseUrl}/${this.getEndpoint()}/week`, {
+    return this.http.get<any>(`${this.baseUrl}/week`, {
       headers: this.headers,
       params: params
     }).toPromise()
@@ -49,16 +49,27 @@ export class PredicService extends BaseService<Predict, number> {
   }
 
 
-  public getPredictDataByRange(first: Date, last: Date, tipo: number, cultivo: number): Promise<any> {
+  public getPredictDataByRange(tipo: number, cultivo: number, data_inicial:Date, data_final:Date): Promise<any> {
     const params = new HttpParams()
-    .set('fecha_inicio', first.toJSON())
-    .set('fecha_fin', last.toJSON())
-    .set('tipo', Number(tipo))
-    .set('cultivo', Number(cultivo))
-    .set('localidad', 1)
-    const request$ = this.http.post<any>(`${this.baseUrl}/${this.getEndpoint()}/range`,null ,{ headers: this.headers, params: params }).pipe(take(1));
+    .set('cultivo_id', Number(cultivo))
+    .set('actividad', Number(tipo))
+    .set('data_inicial', data_inicial.toJSON())
+    .set('data_final', data_final.toJSON())
+    // .set('localidad', 1)
+    const request$ = this.http.post<any>(`${this.baseUrl}/range`,null ,{ headers: this.headers, params: params }).pipe(take(1));
     return lastValueFrom(request$);
   }
+  
+  public getObserverPredictDataByRange(tipo: number, cultivo: number, data_inicial:Date, data_final:Date): Observable<any> {
+    const params = new HttpParams()
+    .set('cultivo_id', Number(cultivo))
+    .set('actividad', Number(tipo))
+    .set('data_inicial', data_inicial.toJSON())
+    .set('data_final', data_final.toJSON())
+    const request$ = this.http.post<any>(`${this.baseUrl}/range`,null ,{ headers: this.headers, params: params });
+    return request$;
+  }
+  
 
   public getPredictDataDate(Day: Date): Promise<any> {
     const params = new HttpParams()
@@ -67,7 +78,7 @@ export class PredicService extends BaseService<Predict, number> {
       // .set('localidad', localidad)
       .set('day', Day.toJSON())
 
-    const request$ = this.http.post<any>(`${this.baseUrl}/${this.getEndpoint()}/day`, null, { headers: this.headers, params: params }).pipe(take(1));
+    const request$ = this.http.post<any>(`${this.baseUrl}/day`, null, { headers: this.headers, params: params }).pipe(take(1));
     return lastValueFrom(request$);
   }
 

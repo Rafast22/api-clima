@@ -17,7 +17,12 @@ async def get_history_date(latitude: str, longitude: str):
     while True:
         r = await get_formated_dict(last_date.strftime("%Y%m%d"), last_date.strftime("%Y%m%d"), latitude, longitude)
         if len(r) == 0 or True in [any(value == -999.0 for value in obj.values()) for obj in r] :
-            last_date = datetime(last_date.year, last_date.month-1, 1)
+            if last_date.month == 1:
+                last_date = datetime(last_date.year-1, 12, 1)
+            else:
+                last_date = datetime(last_date.year, last_date.month-1, 1)
+
+            # last_date = datetime(last_date.year, last_date.month, 1)
         else:
             del r
             break
@@ -57,13 +62,18 @@ async def get_formated_dict(START_DATE, END_DATE, latitude: str, longitude: str)
         "QV2M",
         "T2M",
         "PRECTOTCORR",
-        "WS2M"]
+        "WS2M",
+        "PS"]
      
     S_date = datetime.strptime(START_DATE, "%Y%m%d")
     F_date = datetime.strptime(END_DATE, "%Y%m%d")
           
     counter = 0
     years:List[datetime] = [S_date, F_date]
+
+    for i in range(1,((F_date.year - S_date.year)//3)):
+        d = datetime((S_date.year+(3*i)), 1, 1)
+        years.insert(i, d)
     while True:
         first_date = years[counter].strftime('%Y%m%d')
         last_date = years[counter+1].strftime('%Y%m%d')
@@ -97,6 +107,8 @@ async def get_formated_dict(START_DATE, END_DATE, latitude: str, longitude: str)
     return prepare_object(req)
 
 def insert_year_in_medium(data1:datetime, data2:datetime, year_list:list):
+    if data1.year == data2.year:
+        return year_list
     new_date = data1 + (data2 - data1) / 2
     f_index = year_list.index(data2)
     year_list.insert(f_index, new_date)

@@ -1,14 +1,14 @@
 
 from .._models.cultivo import Cultivo
 from .._models.user import User
-from .._schemas.cultivo import RequestCultivo, RequestCultivoCreate
+from .._schemas.cultivo import RequestCultivoUpdate, RequestCultivoCreate
 from sqlalchemy.orm import Session
 from fastapi import HTTPException, status
 from typing import List
 
-def update_cultivo(db: Session, cultivo: RequestCultivo):
+def update_cultivo(db: Session, id:int, cultivo: RequestCultivoUpdate):
 
-    db_cultivo = Cultivo.get(db, cultivo.id)
+    db_cultivo = Cultivo.get(db, id)
     if not db_cultivo:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
     Cultivo.update(db_cultivo, db, **cultivo.model_dump())
@@ -27,8 +27,6 @@ def delete_cultivo_by_id(db: Session, cultivo_id:int ):
     
 def get_cultivos_by_user_id(db: Session, user_id:int ):
     db_cultivo = Cultivo.get_cultivos_usuario(db, user_id)
-    if not db_cultivo:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND)
     return db_cultivo
 
 def create_cultivo(db: Session, cultivo: RequestCultivoCreate, user:User):

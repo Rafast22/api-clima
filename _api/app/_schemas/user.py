@@ -52,7 +52,6 @@ class RequestUserCreate(RequestUserBase):
         from_attributes = True
 
 class RequestUserUpdate(RequestUserBase):
-    id: int 
     class Config:
             from_attributes = True
 

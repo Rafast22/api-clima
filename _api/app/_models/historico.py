@@ -7,17 +7,10 @@ from .._schemas.nasa_data import RequestDataCreate, RequestData
 from fastapi import HTTPException, status
 from sqlalchemy import func, select
 from .base_model import BaseModel
+from ._base_prediction import BasePrediction
+class History(BasePrediction):
+    __tablename__ = "History"
 
-class History(BaseModel):
-    __tablename__ = "History_Data"
-    date = Column(String, nullable=True)
-    prectotcorr = Column(DECIMAL(10, 3), nullable=True)
-    rh2m = Column(DECIMAL(10, 3), nullable=True)
-    qv2m = Column(DECIMAL(10, 3), nullable=True)
-    t2m = Column(DECIMAL(10, 3), nullable=True)
-    ws2m = Column(DECIMAL(10, 3), nullable=True)
-    localidad_id = Column(Integer, ForeignKey('Localidad.id'))
-    user_id = Column(Integer, ForeignKey('User.id'))
 
     @classmethod
     def create_bulk(cls, session, data_list):

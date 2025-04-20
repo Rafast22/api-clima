@@ -2,7 +2,7 @@ from .._models.localidad import Localidad
 from .._models.user import User
 from .._models.cultivo import Cultivo
 import asyncio
-from .._schemas.localidad import RequestLocalidad, RequestLocalidadCreate
+from .._schemas.localidad import RequestLocalidadUpdate, RequestLocalidadCreate
 from .._schemas.nasa_data import RequestDataCreate
 from sqlalchemy.orm import Session
 from ..interceptor.nasa_request import get_history_date
@@ -14,8 +14,8 @@ async def create_localidad(db: Session, local: RequestLocalidadCreate, backgroun
     db_localidad = Localidad.create(db, **local.model_dump(), user_id=user.id)
     background_tasks.add_task(make_predictions, db, db_localidad)
 
-def update_localidad(db: Session, localidad: RequestLocalidad):
-    db_localidad = Localidad.get(db, localidad.id)
+def update_localidad(db: Session, id:int, localidad: RequestLocalidadUpdate):
+    db_localidad = Localidad.get(db, id)
     if not db_localidad:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Localidad not found')
     db_localidad = Localidad.update(db_localidad, db, **localidad.model_dump())
@@ -43,9 +43,6 @@ def get_localidad_by_cultivo(db: Session, cultivo_id:int ):
 
 def get_localidades_by_user_id(db: Session, cultivo_id:int ):
     db_localidad = Localidad.get_by_user_id(db, cultivo_id)
-    if not db_localidad:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail='Localidad not found')
-
     return db_localidad
 
 async def make_predictions(db:Session, local:Localidad):

@@ -13,7 +13,7 @@ class Cultivo(BaseModel):
     name = Column(String, index=True, nullable=False)
     variety = Column(String, index=True, nullable=False)
     cycle_duration = Column(Integer, index=True, nullable=False)
-    user_id = Column(Integer, ForeignKey('User.id'), nullable=False)
+    user_id = Column(Integer, ForeignKey('User.id'))
     localidad_id = Column(Integer, ForeignKey('Localidad.id'))
     localidad = relationship("Localidad")
 

@@ -4,16 +4,15 @@
     <div class="container" #calendarContainer id="weatherContainer">
         @for(day of weatherData; track day.name){
 
-        <div class="weather-card"
-            [style]="day.today?{'background-color': 'rgba(0, 71, 102, 0.2)', 'border': '1px solid #2e3d49'}:{}">
+        <div class="weather-card" (click)="selectWeatherCard(day.data)" [ngClass]="selectedDate==day.data || day.today?'today':''">
             <div>
                 {{ day.name }}
                 <div style="font-size: small; color: grey;">
                     {{ day.data.getDate() +' ' + day.month }}
                 </div>
             </div>
-            <div style="font-size: 48px;">
-                <img [src]="day.iconUrl" width="48" height="48" alt="Nubes y claros">
+            <div style="font-size: 28px;">
+                <img [src]="day.iconUrl" width="28" height="28" alt="Nubes y claros">
             </div>
             <div class="column">
                 <span style="color: #2A65CB; padding: 5px;">{{day.min}}</span>
