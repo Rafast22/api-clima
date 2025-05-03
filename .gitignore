@@ -1,3 +1,4 @@
+sql_app.db
 .venv
 .venv/*
 api/__pycache__

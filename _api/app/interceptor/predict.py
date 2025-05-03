@@ -88,10 +88,10 @@ def predict(db, history_data, local:Localidad, update=False):
     predictions = {}
     accuracy_list = {}
     model_performance = {}
-
+    new_features = ['t2m', 'rh2m', 'prectotcorr', 'qv2m', 'ws2m', 'ps']
     for target in feature_list:
         if target not in ignore_data_list:
-            new_features = [f for f in feature_list if f != target]
+            new_features = [f for f in new_features if f != target]
             X_train, y_train = train_data[new_features], train_data[target]
             X_test, y_test = test_data[new_features], test_data[target]
             model = train_xgb_model(X_train, y_train, getattr(local, f'model_{target}', None))
