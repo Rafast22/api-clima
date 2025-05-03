@@ -25,23 +25,15 @@ GOOGLE_CLIENT_ID = os.getenv('GOOGLE_CLIENT_ID')
 GOOGLE_CLIENT_SECRET = os.getenv('GOOGLE_CLIENT_SECRET')
 GOOGLE_REDIRECT_URI_HML = os.getenv('GOOGLE_REDIRECT_URI_HML')
 SECRET_KEY = os.getenv('SECRET_KEY')
-print(DATABASE_URL)
-print(SENDER_EMAIL)
-print(SMTP_PASSWORD)
-print(SMTP_SERVER)
-print(SMTP_PORT)
-print(ALGORITHM)
-print(ACCESS_TOKEN_EXPIRE_MINUTES)
-print(GOOGLE_CLIENT_ID)
-print(GOOGLE_CLIENT_SECRET)
-print(GOOGLE_REDIRECT_URI_HML)
-print(SECRET_KEY)
+POSTGRES_PASSWORD = os.getenv('POSTGRES_PASSWORD')
+POSTGRES_DB = os.getenv('POSTGRES_DB')
+POSTGRES_USER = os.getenv('POSTGRES_USER')
 
 if not IS_DOCKER:
     if not DATABASE_URL:
         DATABASE_URL = SQLITE_URL
     else:
-        DATABASE_URL = 'postgresql://postgres:Rei12Rom%40@localhost:5432/DB'
+        DATABASE_URL = f'postgresql://{POSTGRES_USER}:{POSTGRES_PASSWORD}@localhost:5432/{POSTGRES_DB}'
     if gettrace():
         SECRET_KEY = 'test'
         ACCESS_TOKEN_EXPIRE_MINUTES = 1000
@@ -54,7 +46,6 @@ if not IS_DOCKER:
         ALGORITHM = 'HS256'
 else:
     print(IS_DOCKER)
-    time.sleep(5)
     engine = create_engine(DATABASE_URL)
 
 

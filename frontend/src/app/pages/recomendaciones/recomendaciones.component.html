@@ -25,30 +25,6 @@
             </mat-panel-title>
           </mat-expansion-panel-header>
           <div class="filters">
-            <!-- <section>
-              <div class="center">
-                <mat-form-field>
-                  <mat-label>Periodo</mat-label>
-                  <mat-date-range-input [rangePicker]="picker">
-                    <input matStartDate #dateRangeStart placeholder="Fecha de Inicio">
-                    <input matEndDate #dateRangeEnd placeholder="Fecha Final"
-                      (dateChange)="_onSelectedChange(dateRangeStart, dateRangeEnd)">
-                  </mat-date-range-input>
-                  <mat-hint>Dia/Mes/Ano - Dia/Mes/Ano</mat-hint>
-                  <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
-                  <mat-date-range-picker [touchUi]="isMobile" #picker>
-                    @if (isMobile) {
-                    <mat-date-range-picker-actions>
-                      <button mat-button matDateRangePickerCancel>Cancelar</button>
-                      <button mat-raised-button matDateRangePickerApply>Aplicar</button>
-                    </mat-date-range-picker-actions>
-                    }
-                  </mat-date-range-picker>
-
-                </mat-form-field>
-              </div>
-
-            </section> -->
             <section class="radio-button">
               <label>Cultivo:</label>
               <mat-radio-group aria-label="Cultivo" [(ngModel)]="filtros.Cultivo" (change)="CultivoChange()">
@@ -72,8 +48,8 @@
           </div>
           <div class="content">
             <div class="calendar">
-              <calendar #calendarComponent [perfectDays]="perfectDays" (selectedDay)="_onSelectDate($event)"
-                (changeMonth)="monthChange($event)">
+              <calendar #calendarComponent (selectedDay)="_onSelectDate($event)"
+                (changeMonth)="monthChange($event)" [perfectDays]="perfectDays">
               </calendar>
 
             </div>
@@ -110,3 +86,5 @@
     </div> -->
   </div>
 </body>
+
+  <app-loading-overlay *ngIf="isLoading$ | async"></app-loading-overlay>

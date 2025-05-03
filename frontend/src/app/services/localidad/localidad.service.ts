@@ -13,8 +13,13 @@ export class LocalidadService extends BaseService<Localidad, number> {
       super(http);
   }
 
-  getByUserId(id: number): Observable<Localidad> {
-    const url = `${this.baseUrl}/${this.getEndpoint()}/user/${id}`;
+  getMyLocalidades(id: number): Observable<Localidad> {
+    const url = `${this.baseUrl}/my`;
+    return this.http.get<Localidad>(url, { headers: this.headers });
+  }
+
+  getByCultivoId(cultivo: number): Observable<Localidad> {
+    const url = `${this.baseUrl}/cultivo/${cultivo}`;
     return this.http.get<Localidad>(url, { headers: this.headers });
   }
 

@@ -23,6 +23,6 @@
 
     </div>
     <div class="dates">
-        <div *ngFor="let date of calendarDates" class="date" [Dia]="date.Dia" [selectDay]="selectDay">{{ date.date }}</div>
+        <div *ngFor="let date of calendarDates" class="date" [dayInfo]="date.dayInfo" [selectDay]="selectDay">{{ date.day }}</div>
     </div>
 </div>

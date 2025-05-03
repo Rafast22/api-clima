@@ -9,7 +9,7 @@ export const noAuthGuard: CanActivateFn = (route, state) => {
     if (!_logged) {
       return true;
     }
-    // router.navigate(['/principal'])
+    router.navigate(['/recomendaciones'])
     return false;
 
 };

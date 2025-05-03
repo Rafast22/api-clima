@@ -68,6 +68,8 @@ export class NavBarComponent implements AfterViewInit, OnInit {
   openModalHistory() {
     // historico
     const dialogRef = this.dialog.open(HistoricoComponent, {
+      width: '600px',
+      height: '600px',
       data: {},
     });
 

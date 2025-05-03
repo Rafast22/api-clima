@@ -23,7 +23,7 @@
 		{
 			"label": "serve",
 			"type": "shell",
-			"command": "npm run start",
+			"command": "/home/moura/.config/nvm/versions/node/v22.14.0/bin/npm run start",
 			"problemMatcher": [],
 			"group": {
 				"kind": "build"

@@ -6,13 +6,15 @@ class RequestCultivoBase(BaseModel):
     name: str
     variety: str 
     cycle_duration: int
-    user_id:int
         
 class RequestCultivoCreate(RequestCultivoBase):
     pass
 
+class RequestCultivoUpdate(RequestCultivoBase):
+    class Config:
+        from_attributes = True
+
 class RequestCultivo(RequestCultivoBase):
-    id: int
     class Config:
         from_attributes = True
 

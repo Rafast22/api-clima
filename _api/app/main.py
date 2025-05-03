@@ -8,11 +8,13 @@ from fastapi.templating import Jinja2Templates
 from fastapi.staticfiles import StaticFiles
 from apscheduler.schedulers.background import BackgroundScheduler
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
-from .interceptor.predict import predict, update_model_data
+from .interceptor.predict import predict
 from .interceptor.nasa_request import get_history_date, get_new_history_date
-from ._models.localidad import get_by_latitude_longitude, create, RequestLocalidadCreate
+from ._schemas.localidad import RequestLocalidadCreate
+from ._models.localidad import Localidad
 from sqlalchemy.orm import Session
-from fastapi import Depends
+from sqlalchemy import inspect, or_
+from fastapi import Depends, Request, Response
 router = APIRouter()
 # templates = Jinja2Templates(directory="/home/rafa/Projects/Python/api-clima/frontend/dist/front/browser/")
 
@@ -32,23 +34,50 @@ origins = [
 #update_model_data
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    # Base.metadata.create_all(bind=engine)
+
+    # inspector = inspect(engine)
+    # if inspector.has_table("User"):
+    #     Base.metadata.drop_all(bind=engine)
+    
     Base.metadata.create_all(bind=engine)
+
+    with next(get_db()) as db:
+        await verificar_e_criar_registros(db)
+
     yield
     
+async def verificar_e_criar_registros(db: Session):
+    from ._models.cultivo import Cultivo
+    
+    cultivo = db.query(Cultivo).filter(or_(Cultivo.name == 'Maiz', Cultivo.name == 'Soja', Cultivo.name == 'Trigo')).all()
+    if not cultivo:
+        cultivos_iniciais = [
+            {"name": "Trigo", "variety": "Comum", "cycle_duration": 150},  # Exemplo em dias
+            {"name": "Maiz", "variety": "Comum", "cycle_duration": 180},
+            {"name": "Soja", "variety": "Comum", "cycle_duration": 120},
+        ]
+        for cultivo_data in cultivos_iniciais:
+            cult = Cultivo(**cultivo_data)            
+            db.add(cult)
+            db.commit()
+        print("Registros iniciais criados com sucesso.")
+    else:
+        print("Registros existentes encontrados. Nenhuma ação necessária.")
+
 async def fetch_request(db):
-    # d = next(db)
-    d = db
 
-    l = get_by_latitude_longitude(d, "-25.65", "-54.70")
-    if not l:
+    db_localidades = Localidad.get_by_latitude_longitude(db, "-25.65", "-54.70")
+    db_localidad = None
+    if len(db_localidades) > 0:
+        db_localidad = db_localidades[0]
+    if not db_localidad:
         new = RequestLocalidadCreate(**{'latitude':'-25.65', 'longitude':'-54.70', 'user_id':None, 'cultivo_id':None} )
-        l = create(d, new)
+        db_localidad = Localidad.create(db, **new.model_dump())
     
-    h = await get_history_date(l.latitude, l.longitude)
-    predict(d, h, l)
-    del h, l, d
-
-    
+    h = await get_history_date(db_localidad.latitude, db_localidad.longitude)
+    predict(db, h, db_localidad)
+    del h, db_localidad
 
 
 app = FastAPI(lifespan=lifespan)    
@@ -70,6 +99,10 @@ scheduler.start()
 # async def root(request: Request):
     
 #     return templates.TemplateResponse("index.html", {"request": request})
+
+@router.get("/")
+async def root(request:Request):
+    return RedirectResponse("/docs")
 
 @router.get("/test/preditct")
 async def f(db: Session = Depends(get_db)):
