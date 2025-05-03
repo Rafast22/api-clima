@@ -1,0 +1,90 @@
+<body>
+  <div class="container">
+
+    @if(!hideHeader){
+    <div class="header">
+      <mat-accordion>
+        <mat-expansion-panel [(expanded)]="CardClimaOpen">
+          <mat-expansion-panel-header>
+            <mat-panel-title>
+              Clima 7 días
+            </mat-panel-title>
+          </mat-expansion-panel-header>
+          <app-clima-card></app-clima-card>
+        </mat-expansion-panel>
+      </mat-accordion>
+    </div>
+    }
+
+    <div class="header">
+      <mat-accordion>
+        <mat-expansion-panel [(expanded)]="CardDiasOptimos">
+          <mat-expansion-panel-header>
+            <mat-panel-title>
+              Días óptimos
+            </mat-panel-title>
+          </mat-expansion-panel-header>
+          <div class="filters">
+            <section class="radio-button">
+              <label>Cultivo:</label>
+              <mat-radio-group aria-label="Cultivo" [(ngModel)]="filtros.Cultivo" (change)="CultivoChange()">
+                @for (cultivo of cultivos; track $index) {
+                <mat-radio-button [value]="cultivo.value"
+                  [checked]="cultivo.checked">{{cultivo.description}}</mat-radio-button>
+                }
+              </mat-radio-group>
+
+            </section>
+            <section class="radio-button">
+              <label>Tipo de actividad:</label>
+              <mat-radio-group aria-label="Tipo de actividad:" [(ngModel)]="filtros.Actividad" (change)="ActividadChange()">
+                @for (actividad of actividades; track $index) {
+                <mat-radio-button [value]="actividad.value"
+                  [checked]="actividad.checked">{{actividad.description}}</mat-radio-button>
+                }
+              </mat-radio-group>
+            </section>
+
+          </div>
+          <div class="content">
+            <div class="calendar">
+              <calendar #calendarComponent (selectedDay)="_onSelectDate($event)"
+                (changeMonth)="monthChange($event)" [perfectDays]="perfectDays">
+              </calendar>
+
+            </div>
+            <div class="chart-container">
+              <h3>Reporte de condiciones climáticas</h3>
+              <canvas id="chart"></canvas>
+            </div>
+          </div>
+        </mat-expansion-panel>
+      </mat-accordion>
+    </div>
+
+
+    <!-- <div class="details" id="details">
+      <h3>Detalles del día</h3>
+      @if(_diaSelecionado){
+      <p>Seleccione un día para ver los detalles.</p>
+      }
+      @else{
+      <div class="row">
+        <div class="linha">Temperatura Media del dia {{this.diaSeleccionado.Dia.getDate()}} es:
+          {{this.diaSeleccionado.TemperaturaMedia}}</div>
+        <div class="linha">Humedad Media del dia {{this.diaSeleccionado.Dia.getDate()}} es:
+          {{this.diaSeleccionado.HumedadMedia}}</div>
+        <div class="linha">Precipitacion Media del dia {{this.diaSeleccionado.Dia.getDate()}} es:
+          {{this.diaSeleccionado.PrecipitacionMedia}}</div>
+      </div>
+      <div class="center" style="display: flex;justify-content: center;">
+        <div class="" style="font-weight: bold;">Es un dia Favorable para la {{this.getTipoSelecionado}} de
+          {{this.getCultivoSelecionado}}</div>
+      </div>
+
+      }
+    </div> -->
+  </div>
+</body>
+
+  <app-loading-overlay *ngIf="isLoading$ | async"></app-loading-overlay>

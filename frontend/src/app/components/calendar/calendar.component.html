@@ -1,13 +1,13 @@
 <div class="calendar">
         <div class="header">
-            <div class="button-header" (click)="changeMonth(-1)">
+            <div class="button-header" (click)="clickChangeMonth(-1)">
                 <mat-icon >chevron_left</mat-icon>
                 <span >Anterior</span>
             </div>
 
        
         <span style="padding: 5px">{{ monthYear }}</span>
-        <div class="button-header" (click)="changeMonth(1)">
+        <div class="button-header" (click)="clickChangeMonth(1)">
             <span>Siguiente</span>
             <mat-icon >chevron_right</mat-icon>
         </div>
@@ -23,6 +23,6 @@
 
     </div>
     <div class="dates">
-        <div *ngFor="let date of calendarDates" class="date" [Dia]="date.Dia" [selectDay]="selectDay">{{ date.date }}</div>
+        <div *ngFor="let date of calendarDates" class="date" [dayInfo]="date.dayInfo" [selectDay]="selectDay">{{ date.day }}</div>
     </div>
 </div>

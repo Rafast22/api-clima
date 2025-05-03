@@ -5,7 +5,7 @@
             <h2>Acceder a mi cuenta</h2>
             <div class="social-login">
                 <mat-icon (click)="registerWithFacebook()" style="width: 30px; height: 30px; margin-right: 15px;" svgIcon="facebook" class="clickable-icon">facebook</mat-icon>
-                <mat-icon (click)="registerWithFacebook()" style="width: 30px; height: 30px;" svgIcon="google" class="clickable-icon"></mat-icon>
+                <mat-icon (click)="registerWithGoogle()" style="width: 30px; height: 30px;" svgIcon="google" class="clickable-icon"></mat-icon>
              
               
             </div>
@@ -37,7 +37,8 @@
                     <mat-error>{{errorMessagepassword()}}</mat-error>
                   }
                 </mat-form-field>
-                <a href="#">Olvidaste tu contraseña?</a>
+                <a class="clickable-text" (click)="openModalForgotPassword()">Olvidaste tu contraseña?</a>
+
                 <button type="submit" [disabled]="formLogar.invalid">ENTRAR</button>
             </form>
         </div>

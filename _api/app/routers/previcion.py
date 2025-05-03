@@ -1,26 +1,73 @@
-from fastapi import Depends, APIRouter, HTTPException, status
-from typing import Union, Annotated
-from .._schemas.user import RequestUserCreate, RequestUser
-from .._models.user import User
-from .._view import previcion
+from fastapi import Depends, APIRouter, Query
+from typing import Union, Annotated, List
 from ..database import get_db
-from .._view.auth import is_user_autenticate
+from .._view.auth.auth import is_user_autenticate, get_current_user
 from sqlalchemy.orm import Session
-from datetime import date, datetime
-router = APIRouter()
+from datetime import date, datetime, timedelta
+from .._models.cultivo import Cultivo
+from .._models.localidad import Localidad
+from .._models.user import User
+from .._schemas.localidad import RequestLocalidadCreate
+from ..interceptor.nasa_request import get_history_date
+from ..interceptor.predict import predict
+from .._view.previcion import (get_previcion_by_day as get_previcion_by_day_view, 
+                               get_previcion_semana as get_previcion_semana_view,
+                               get_previcion_semana_by_data as get_previcion_semana_by_data_view,
+                               get_perfet_days as get_perfet_days_view,
+                               get_previcion_total_from_today as get_previcion_total_from_today_view) 
 
-@router.post("/api/previciones")
-async def get_previcion(fecha_inicio:date, fecha_final:date,tipo:int, cultivo:int,   is_autenticate: Annotated[bool, Depends(is_user_autenticate)], db: Session = Depends(get_db)):
-    return previcion.get_previcion(db, fecha_inicio, fecha_final, tipo, cultivo)
+router = APIRouter(prefix="/api/user/weather/forecast", tags=["Previciones"])
 
-@router.post("/api/previcion")
-async def get_previcion_by_day(tipo:int, cultivo:int, dia:str, is_autenticate: Annotated[bool, Depends(is_user_autenticate)], db: Session = Depends(get_db), ):
-    return previcion.get_previcion_by_day(db, dia, tipo, cultivo)
 
-@router.post("/api/previcion/semana")
-async def get_previcion_semana(fecha_inicio: datetime, db: Session = Depends(get_db), ):
-    return previcion.get_previcion_semana(db, fecha_inicio)
+@router.get("/week", summary="Get weekend predict list", description="Returns a list of weather forecasts for a week")
+async def get_previcion_semana(is_autenticate: Annotated[bool, Depends(is_user_autenticate)],
+                               localidad:int, db: Session = Depends(get_db)):
+    return get_previcion_semana_view(db, localidad)
 
-@router.get("/api/start-previcion")
-async def get_previcion_by_day(db: Session = Depends(get_db), ):
-    return previcion.start_predict(db)
+@router.post("/week/date", summary="Get weekend predict list by date range", description="Returns a list of weather forecasts for a week")
+async def get_previcion_semana_by_date(is_autenticate: Annotated[bool, Depends(is_user_autenticate)],
+                                data_inicial:datetime, data_final:datetime,
+                                localidad:Annotated[Localidad, Depends(lambda localidad_id, db=Depends(get_db): Localidad.get(db,localidad_id))],
+                                cultivo:Annotated[Cultivo, Depends(lambda cultivo_id, db=Depends(get_db): Cultivo.get(db, cultivo_id))],
+                               db: Session = Depends(get_db)):
+    return get_previcion_semana_by_data_view(db, data_inicial, data_final, cultivo, localidad)
+
+@router.post("/range", summary="Get predict list by date range", description="Returns a list of weather forecasts for a date range")
+async def get_perfect_days_periodo(is_autenticate: Annotated[bool, Depends(is_user_autenticate)],
+                                actividad:int, data_inicial:datetime, data_final:datetime,
+                                cultivo:Annotated[Cultivo, Depends(lambda cultivo_id, db=Depends(get_db): Cultivo.get(db,cultivo_id))],
+                                db: Session = Depends(get_db),
+                                user: User = Depends(get_current_user)):
+
+    return get_perfet_days_view(db, user.id, cultivo.id, actividad, data_inicial, data_final)
+
+@router.post("/day", summary="Get predict list by day", description="Returns a list of weather forecasts for a date range")
+async def get_previcion_periodo_day(is_autenticate: Annotated[bool, Depends(is_user_autenticate)],
+                                day: datetime = Query(..., description="Start date of the period in YYYY-MM-DD format."),
+                                db: Session = Depends(get_db) ):
+
+    return get_previcion_by_day_view(db, day)
+
+@router.post("", 
+             summary="Get predict list", 
+             description="Returns a list of weather forecasts for a date range")
+
+async def get_previcion_periodo_month(is_autenticate: Annotated[bool, Depends(is_user_autenticate)],
+                                      tipo:int, cultivo:int, localidad:int,
+                                      db: Session = Depends(get_db) ):
+
+    return get_previcion_total_from_today_view(db, tipo, cultivo, localidad)
+
+
+@router.get("testP")
+async def p(db: Session = Depends(get_db)):
+    
+    db_localidad = Localidad.get_by_latitude_longitude(db, "-25.65", "-54.70")
+    if not db_localidad:
+        new = RequestLocalidadCreate(**{'latitude':'-25.65', 'longitude':'-54.70', 'user_id':None, 'cultivo_id':None} )
+        localidad = Localidad.create(db, **new.model_dump())
+    elif len(db_localidad) > 0:
+        localidad = db_localidad[0]
+    history = await get_history_date(localidad.latitude, localidad.longitude)
+    predict(db, history, localidad)
+    del history, localidad, db

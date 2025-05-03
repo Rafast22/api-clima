@@ -3,18 +3,11 @@
   font-family: Arial, sans-serif;
   background: url('../../../assets/imagen/fondo.png') no-repeat center center fixed;
   background-size: cover;
+  min-height: 100vh;
+  background-color: #e0e0e0; 
+  background-position: center;
 }
-/* display: flex;
-justify-content: center;
-align-items: center;
-width: 100%;
-height: 100vh;
-font-family: 'Open Sans', sans-serif;
-flex-direction: column;
-background-image: url('../../../assets/imagen/fondo.png');
-background-size: cover;
-background-repeat: no-repeat;
-background-position: center;  */
+
 .container {
   display: flex;
   height: 100vh;
@@ -114,16 +107,28 @@ background-position: center;  */
   }
 }
 .clickable-icon {
-  cursor: pointer; /* Cursor de ponteiro ao passar o mouse */
-  transition: transform 0.2s ease; /* Transição suave para o efeito de clique */
+  cursor: pointer; 
+  transition: transform 0.2s ease; 
 }
 
 .clickable-icon:hover {
-  transform: scale(1.1); /* Aumenta o tamanho ao passar o mouse */
-  /* Outras propriedades visuais, como cor ou sombra */
+  transform: scale(1.1); 
+  
 }
 
 .clickable-icon:active {
-  transform: scale(0.95); /* Diminui o tamanho ao clicar */
-  /* Outras propriedades visuais */
+  transform: scale(0.95); 
+  
+}
+
+
+Copy
+.clickable-text {
+    color: blue;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+.clickable-text:hover {
+    color: darkblue;
 }

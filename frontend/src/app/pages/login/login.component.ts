@@ -3,24 +3,26 @@ import { Component, inject, OnInit, signal } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, FormsModule, NgModel, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { MatIconModule, MatIconRegistry } from '@angular/material/icon';
-import { HttpClientModule } from '@angular/common/http';
 import { DomSanitizer } from '@angular/platform-browser';
-import { UserService } from '../../services/user/user.service';
+import { AuthService } from '../../services/auth/auth.service';
 import {MatInputModule} from '@angular/material/input';
 import {merge} from 'rxjs';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop';
-
-
+import { NotificationService } from '../../services/notification/notification.service';
+import { MatDialog } from '@angular/material/dialog';
+import { ForgotPasswordComponent } from '../forgot-password/forgot-password.component';
+import { Oauth2GoogleModalComponent } from './oauth2-google-modal/oauth2-google-modal.component';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [FormsModule, CommonModule, ReactiveFormsModule, MatIconModule, HttpClientModule, MatInputModule],
+  imports: [FormsModule, CommonModule, ReactiveFormsModule, MatIconModule, MatInputModule],
   templateUrl: './login.component.html',
   styleUrl: './login.component.css',
-  providers:[UserService]
+  providers:[AuthService]
 })
 export class LoginComponent implements OnInit {
+  readonly dialog = inject(MatDialog);
   readonly email = new FormControl('', [Validators.required, Validators.email]);
   readonly password = new FormControl('', [Validators.required]);
   errorMessageEmail = signal('');
@@ -29,16 +31,13 @@ export class LoginComponent implements OnInit {
   formLogar! : FormGroup;
   mensagemErro = "";
   submetido = false;
-
-  // public email:string = '';
-  // public password:string = '';
   
   constructor(
     private fb: FormBuilder,
-    private service: UserService,
+    private service: AuthService,
     private route: Router,
     private matIconRegistry: MatIconRegistry,private domSanitizer: DomSanitizer,
-    
+    private notification:NotificationService
   ) { 
     this.matIconRegistry.addSvgIcon(
       "google",
@@ -57,7 +56,7 @@ export class LoginComponent implements OnInit {
     merger(this.password.statusChanges, this.password.valueChanges).pipe(takeUntilDestroyed()).subscribe(() => this.updateErrorMessagePassword());
    
    }
-  
+   
    updateErrorMessage() {
       if (this.email.hasError('required')) {
         this.errorMessageEmail.set('El email es obligatorio');
@@ -94,13 +93,14 @@ export class LoginComponent implements OnInit {
     if(this.formLogar.valid){
       const form = this.formLogar.value
       await this.service.login(form).then((resposta : boolean)=>{
-        console.log (resposta)
         if(resposta){
-          this.route.navigateByUrl("principal")
-        }else{
-            this.mensagemErro = 'Usuario o Contrasenha incorrecta'
-            console.log(this.mensagemErro)
+          this.route.navigateByUrl("recomendaciones")
+          return;
         }
+        this.notification.abrirNotificacionMensaje('Usuario o Contrasenha incorrecta', "success")   
+        this.mensagemErro = ''
+        console.log(this.mensagemErro)
+        
       })
     }
   }
@@ -108,5 +108,16 @@ export class LoginComponent implements OnInit {
   public registerWithFacebook(){
     
   }
+  
+  public registerWithGoogle(){
+     const dialogRef = this.dialog.open(Oauth2GoogleModalComponent, {
+          data: {},
+        });
+  }
 
+
+  openModalForgotPassword(){
+      this.route.navigateByUrl("recuperar-contrasena")
+  
+    }
 }

@@ -4,13 +4,13 @@ import { MatIconModule } from '@angular/material/icon';
 import { DiaOptimoDirective } from './dia-optimo.directive';
 
 @Component({
-  selector: 'app-calendar',
+  selector: 'calendar',
   standalone: true,
   imports: [CommonModule, MatIconModule, DiaOptimoDirective],
   templateUrl: './calendar.component.html',
   styleUrl: './calendar.component.css'
 })
-export class CalendarComponent{
+export class CalendarComponent implements OnChanges{
   @ViewChild('calendarContainer') calendarContainer: ElementRef | undefined = undefined;
 
   currentDate: Date = new Date();
@@ -25,61 +25,62 @@ export class CalendarComponent{
   }
 
   @Output()
+  changeMonth = new EventEmitter<Date>();
+
+  @Output()
   selectedDay = new EventEmitter<Date>();
  
   @Input()
   public perfectDays: any[];
 
-  @Input()
-  public ListPerfectDays = (day:Date)=>{};
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['perfectDays']) {
+      const valorAnterior = changes['perfectDays'].previousValue;
+      const valorAtual = changes['perfectDays'].currentValue;
 
-  changeMonth(offset: number): void {
-      this.currentDate.setMonth(this.currentDate.getMonth() + offset);
-      this.updateCalendar();
-  }
-  updateCalendarColors(){
-    if(!this.calendarContainer) return;
-    const container = this.calendarContainer.nativeElement;
-    // const cards = container.querySelector('.container');
-
-  }
-  public updateCalendar(): void {
-      this.monthYear = this.currentDate.toLocaleString('default', { month: 'long', year: 'numeric' });
-      this.calendarDates = this.getDatesInMonth(this.currentDate);
-      this.monthYear = this.monthYear[0].toUpperCase() + this.monthYear.slice(1)
-      for (const day of this.calendarDates){
-        if(day.Dia.UTCDate){ 
-          const perfectDay = this.perfectDays.filter(d => d.getTime() == day.Dia.UTCDate?.getTime())
-          if(perfectDay.length > 0){
-            day.Dia.Optimo = true;
-            day.Dia.onClick = this.selectDay;
-          }
-          else
-            day.Dia.Optimo = false;
-        }      
+      if (valorAnterior !== valorAtual) {
+        this.updateCalendar();
       }
+    }
   }
 
-  getDatesInMonth(date: Date): DateCalendar[] {
-      const today = new Date();
+  clickChangeMonth(offset: number): void {
+      this.currentDate = new Date(this.currentDate.getFullYear(), (this.currentDate.getMonth() + offset), 1);
+      this.updateCalendar();
+      this.changeMonth.emit(this.currentDate);
+  }
+
+
+  public updateCalendar(): void {
+      this.monthYear = this.currentDate.toLocaleString('es-ES', { month: 'long', year: 'numeric' });
+    this.getDatesInMonth(this.currentDate)
+      this.monthYear = this.monthYear[0].toUpperCase() + this.monthYear.slice(1);
+
+  }
+
+  getDatesInMonth(date: Date){
+      const a = new Date();
       const firstDayindex = (new Date(date.getFullYear(), date.getMonth(), 1).getDay() + 6) % 7;
       const lastDay = new Date(date.getFullYear(), date.getMonth() + 1, 0);
       const dates: DateCalendar[] = [];
-
       for (let i = 1; i <= lastDay.getDate(); i++) {
         const currentDate = new Date(date.getFullYear(), date.getMonth(), i);
         const isWeekend = currentDate.getDay() === 0 || currentDate.getDay() === 6; 
-        const d:DateCalendar = {date:i.toString(), isWeekend:isWeekend, Dia:<D>{UTCDate:currentDate}}
-        if(d.Dia.UTCDate?.getDate() == today.getDate()) d.Dia.Today = true;
-        dates.push(d);
+        const day:DateCalendar = {day:i.toString(), isWeekend:isWeekend, dayInfo:<PerfectDay>{Date:currentDate}}
+        const perfectDay = this.perfectDays.filter(perfect => perfect.date.getTime() == day.dayInfo?.Date?.getTime())
+        if(perfectDay.length > 0){
+          day.dayInfo.Optimo = perfectDay[0].perfect;
+        }
+        if(`${a.getDate()}${a.getMonth()}${a.getFullYear()}` == `${day.dayInfo?.Date.getDate()}${day.dayInfo?.Date.getMonth()}${day.dayInfo?.Date.getFullYear()}`) day.dayInfo.Today = true
+        
+        dates.push(day);
+
       }
 
-
-      // Adiciona células vazias antes do primeiro dia do mês
       for (let i = 0; i < firstDayindex; i++) {
-        dates.unshift({ "date":"", Dia:<D>{}}); 
+        dates.unshift({ "day":"", dayInfo:<PerfectDay>{}}); 
       }
-      return dates;
+      this.calendarDates = [...dates];
   }
   
   selectDay = (date?:Date)=>{
@@ -88,19 +89,14 @@ export class CalendarComponent{
 }
 
 
-class DateCalendar{
-  public date:string
-  public isWeekend?: boolean
-  public Dia:D = <D>{}; 
-  constructor(date: number, isWeekend: boolean, D: Date){
-    this.date = date.toString();
-    this.isWeekend = isWeekend;
-  }
+interface DateCalendar{
+  day:string; //Dia exibido no calendario
+  isWeekend?: boolean; //se e final de semana
+  dayInfo:PerfectDay; //objet
 }
-interface D{
-  Optimo?:boolean;
-  Today?:boolean;
-  onClick?:any;
-  UTCDate?:Date;
+interface PerfectDay{
+  Today:boolean;
+  Optimo?:number;
+  Date:Date;
 }
 
