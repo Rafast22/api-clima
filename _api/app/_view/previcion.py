@@ -119,7 +119,7 @@ def get_perfet_days(db: Session, user_id:int, cultivo: int, tipo: int, data_inic
     if cultivo == 1:
         cul = "trigo" 
     elif cultivo == 2:
-        cul = "mais"
+        cul = "maiz"
     elif cultivo == 3:
         cul = "soja"
 

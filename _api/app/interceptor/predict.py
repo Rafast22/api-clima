@@ -147,13 +147,6 @@ def calculate_accuracy_mean(row):
     np_array = row.to_numpy()
     return np.mean(np_array)
 
-def gaussian_score(value, ranges):
-    score = 0.0
-    for (min_val, max_val, sigma) in ranges:
-        mean = (min_val + max_val) / 2
-        if min_val <= value <= max_val:
-            score = max(score, norm.pdf(value, mean, sigma) / norm.pdf(mean, mean, sigma))
-    return score
 
 def _classify_day_harvest(row, crop_type):
     t2m_media = row['t2m']
@@ -161,7 +154,6 @@ def _classify_day_harvest(row, crop_type):
     prectotcorr_media = row['prectotcorr']
     qv2m_media = row['qv2m']
     ws2m_media = row['ws2m']
-
     thresholds = {
         'soja': {
             't2m': [(25, 30, 2.5), (20, 25, 2.0), (15, 20, 1.5), (30, 35, 2.0), (35, 40, 1.5)],
@@ -170,7 +162,7 @@ def _classify_day_harvest(row, crop_type):
             'qv2m': [(8, 11, 2.0), (7, 8, 1.5), (6, 7, 1.0), (11, 13, 1.5), (13, 15, 1.0)],
             'ws2m': [(0, 3, 1.5), (3, 5, 1.0), (5, 7, 0.5)]
         },
-        'mais': {
+        'maiz': {
             't2m': [(25, 32, 2.5), (20, 25, 2.0), (15, 20, 1.5), (32, 35, 2.0), (35, 38, 1.5)],
             'rh2m': [(50, 60, 2.0), (45, 50, 1.5), (40, 45, 1.0), (60, 65, 1.5), (65, 70, 1.0)],
             'prectotcorr': [(0, 1, 1.5), (1, 3, 1.0), (3, 8, 0.5), (8, 15, 0.0)],
@@ -192,14 +184,11 @@ def _classify_day_harvest(row, crop_type):
             'ws2m': [(0, 4, 1.5), (4, 6, 1.0), (6, 8, 0.5)]
         }
     }
-
     if crop_type in thresholds:
         crop_thresholds = thresholds[crop_type]
     else:
         print(f"Aviso: Cultura '{crop_type}' não reconhecida. Usando valores genéricos.")
         crop_thresholds = thresholds['default']
-
-
     weights = {'t2m': 0.3, 'rh2m': 0.25, 'prectotcorr': 0.2, 'qv2m': 0.15, 'ws2m': 0.1}
     score = 0.0
     score += integrated_gaussian_score(t2m_media, crop_thresholds['t2m']) * weights['t2m']
@@ -207,9 +196,7 @@ def _classify_day_harvest(row, crop_type):
     score += integrated_gaussian_score(prectotcorr_media, crop_thresholds['prectotcorr']) * weights['prectotcorr']
     score += integrated_gaussian_score(qv2m_media, crop_thresholds['qv2m']) * weights['qv2m']
     score += integrated_gaussian_score(ws2m_media, crop_thresholds['ws2m']) * weights['ws2m']
-
     percentage = score * 100 / sum(weights.values())
-
     return min(max(percentage, 0), 100)
 
 def _classify_day_planting(row, crop_type):
@@ -227,7 +214,7 @@ def _classify_day_planting(row, crop_type):
             'qv2m': [(8, 12, 2.0), (7, 8, 1.5), (6, 7, 1.0), (12, 14, 1.5), (14, 16, 1.0)],
             'ws2m': [(0, 4, 1.5), (4, 6, 1.0), (6, 8, 0.5)]
         },
-        'mais': {
+        'maiz': {
             't2m': [(25, 32, 2.5), (20, 25, 2.0), (18, 20, 1.5), (32, 35, 2.0), (35, 38, 1.5)],
             'rh2m': [(65, 85, 2.0), (60, 65, 1.5), (55, 60, 1.0), (85, 90, 1.5), (90, 95, 1.0)],
             'prectotcorr': [(5, 15, 1.5), (2, 5, 1.0), (15, 20, 1.0), (20, 25, 0.5)],
@@ -258,19 +245,12 @@ def _classify_day_planting(row, crop_type):
 
     weights = {'t2m': 0.3, 'rh2m': 0.25, 'prectotcorr': 0.2, 'qv2m': 0.15, 'ws2m': 0.1}
     score = 0.0
-    # score += gaussian_score(t2m_media, crop_thresholds['t2m']) * weights['t2m']
-    # score += gaussian_score(rh2m_media, crop_thresholds['rh2m']) * weights['rh2m']
-    # score += gaussian_score(prectotcorr_media, crop_thresholds['prectotcorr']) * weights['prectotcorr']
-    # score += gaussian_score(qv2m_media, crop_thresholds['qv2m']) * weights['qv2m']
-    # score += gaussian_score(ws2m_media, crop_thresholds['ws2m']) * weights['ws2m']
 
     score += integrated_gaussian_score(t2m_media, crop_thresholds['t2m']) * weights['t2m']
     score += integrated_gaussian_score(rh2m_media, crop_thresholds['rh2m']) * weights['rh2m']
     score += integrated_gaussian_score(prectotcorr_media, crop_thresholds['prectotcorr']) * weights['prectotcorr']
     score += integrated_gaussian_score(qv2m_media, crop_thresholds['qv2m']) * weights['qv2m']
     score += integrated_gaussian_score(ws2m_media, crop_thresholds['ws2m']) * weights['ws2m']
-
-
     percentage = score * 100 / sum(weights.values())
 
     return min(max(percentage, 0), 100)

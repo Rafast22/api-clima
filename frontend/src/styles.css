@@ -21,3 +21,13 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
     background-color: #ff9800; /* Laranja */
     color: white;
   }
+
+  mat-radio-button.mat-radio-checked .mat-radio-outer-circle {
+    border-color: #44475A !important;
+  }
+  mat-radio-button.mat-radio-checked .mat-radio-inner-circle {
+    background-color: #44475A !important;
+  }
+  mat-radio-button .mat-radio-ripple {
+    color: #44475A !important;
+  }
